@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  backend:
+    container_name: backend
+    build:
+      context: ./edutrek-server
+      dockerfile: ./Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://web-database:5432/edutrekadmin
+      - SPRING_DATASOURCE_USERNAME=edutrekadmin
+      - SPRING_DATASOURCE_PASSWORD=ajsklhdkjashdkujweh233231sadsd1!
+    depends_on:
+      - web-database
+
+  web-database:
+    container_name: web-database
+    image: postgres:15.5
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=edutrekadmin
+      - POSTGRES_USER=ajsklhdkjashdkujweh233231sadsd1!
+    volumes:
+      - ./database/initialisation.sql:/docker-entrypoint-initdb.d/initialisation.sql
+      - ./server-data:/var/lib/postgresql/data
