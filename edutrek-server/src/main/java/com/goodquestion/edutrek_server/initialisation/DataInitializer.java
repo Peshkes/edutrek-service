@@ -4,14 +4,11 @@ import com.goodquestion.edutrek_server.modules.authentication.entities.AccountDo
 import com.goodquestion.edutrek_server.modules.authentication.entities.Roles;
 import com.goodquestion.edutrek_server.modules.authentication.repositories.AccountRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Component
 @AllArgsConstructor
