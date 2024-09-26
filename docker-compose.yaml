@@ -21,8 +21,8 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_PASSWORD=edutrekadmin
-      - POSTGRES_USER=ajsklhdkjashdkujweh233231sadsd1!
+      - POSTGRES_PASSWORD=ajsklhdkjashdkujweh233231sadsd1!
+      - POSTGRES_USER=edutrekadmin
     volumes:
       - ./database/initialisation.sql:/docker-entrypoint-initdb.d/initialisation.sql
       - ./server-data:/var/lib/postgresql/data
