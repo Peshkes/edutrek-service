@@ -35,10 +35,10 @@ public class SecurityConfig {
         http.authorizeHttpRequests((authorizeHttpRequests) ->
                 authorizeHttpRequests
                         .requestMatchers(HttpMethod.GET,"/auth/csrf").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/auth", "/auth/{id}").hasRole(Roles.ROLE_PRINCIPAL.getValue())
+                        .requestMatchers(HttpMethod.GET,"/auth", "/auth/{id}").hasRole(Roles.ROLE_PRINCIPAL.getShortValue())
                         .requestMatchers(HttpMethod.POST,"/auth").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/account").hasRole(Roles.ROLE_PRINCIPAL.getValue())
-                        .requestMatchers(HttpMethod.DELETE, "/auth/{id}").hasRole(Roles.ROLE_PRINCIPAL.getValue())
+                        .requestMatchers(HttpMethod.POST, "/auth/account").hasRole(Roles.ROLE_PRINCIPAL.getShortValue())
+                        .requestMatchers(HttpMethod.DELETE, "/auth/{id}").hasRole(Roles.ROLE_PRINCIPAL.getShortValue())
                         .anyRequest().permitAll()
         );
         http.csrf(csrf -> csrfTokenRepository());

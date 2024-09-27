@@ -1,22 +1,23 @@
 package com.goodquestion.edutrek_server.modules.authentication.entities;
 
 import com.goodquestion.edutrek_server.modules.authentication.dto.AddNewAccountRequestDto;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.annotation.processing.Generated;
-import java.util.UUID;
 import java.util.List;
+import java.util.UUID;
 
 @NoArgsConstructor
 @Getter
 @Document("accounts")
 public class AccountDocument {
     @Id
-    @Generated(value = "UUID")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID accountId;
     private String login;
     @Setter
