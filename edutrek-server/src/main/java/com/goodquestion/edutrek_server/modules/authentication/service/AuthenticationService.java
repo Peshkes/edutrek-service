@@ -1,8 +1,12 @@
 package com.goodquestion.edutrek_server.modules.authentication.service;
 
+import com.goodquestion.edutrek_server.config.JwtService;
 import com.goodquestion.edutrek_server.config.SecurityConfig;
-import com.goodquestion.edutrek_server.error.AuthenticationException.*;
-import com.goodquestion.edutrek_server.error.DatabaseException.*;
+import com.goodquestion.edutrek_server.error.AuthenticationException.NoAccountsException;
+import com.goodquestion.edutrek_server.error.AuthenticationException.UserNotFoundException;
+import com.goodquestion.edutrek_server.error.AuthenticationException.WrongPasswordException;
+import com.goodquestion.edutrek_server.error.DatabaseException.DatabaseAddingException;
+import com.goodquestion.edutrek_server.error.DatabaseException.DatabaseDeletingException;
 import com.goodquestion.edutrek_server.modules.authentication.dto.AddNewAccountRequestDto;
 import com.goodquestion.edutrek_server.modules.authentication.dto.AuthenticationDataDto;
 import com.goodquestion.edutrek_server.modules.authentication.dto.AuthenticationResultDto;
@@ -10,8 +14,7 @@ import com.goodquestion.edutrek_server.modules.authentication.dto.PublicAccountD
 import com.goodquestion.edutrek_server.modules.authentication.entities.AccountDocument;
 import com.goodquestion.edutrek_server.modules.authentication.entities.Roles;
 import com.goodquestion.edutrek_server.modules.authentication.repositories.AccountRepository;
-import com.goodquestion.edutrek_server.config.JwtService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -26,7 +29,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class AuthenticationService implements UserDetailsService {
 

@@ -14,6 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 public class AddNewAccountRequestDto {
 
+    private String email;
+
     @NotBlank(message = "Username is mandatory")
     @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
     private String login;
