@@ -20,6 +20,16 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class ErrorController  {
 
+    @ExceptionHandler(PasswordAlreadyUsedException.class)
+    ResponseEntity<String> passwordAlreadyUsedExceptionHandler(PasswordAlreadyUsedException e) {
+        return returnResponse(e.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(LoginAlreadyExistsException.class)
+    ResponseEntity<String> loginAlreadyExistsExceptionHandler(LoginAlreadyExistsException e) {
+        return returnResponse(e.getMessage(), HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(DatabaseException.class)
     ResponseEntity<String> databaseExceptionHandler(DatabaseException e) {
         return returnResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -35,19 +45,9 @@ public class ErrorController  {
         return returnResponse(e.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(TokenExpiredException.class)
-    ResponseEntity<String> tokenExpiredExceptionHandler(TokenExpiredException e) {
-        return returnResponse(e.getMessage(), HttpStatus.UNAUTHORIZED);
-    }
-
     @ExceptionHandler(UserNotFoundException.class)
     ResponseEntity<String> userNotFoundExceptionHandler(UserNotFoundException e) {
         return returnResponse(e.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(TokenValidationException.class)
-    ResponseEntity<String> tokenValidationExceptionHandler(TokenValidationException e) {
-        return returnResponse(e.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)

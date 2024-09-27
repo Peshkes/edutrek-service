@@ -8,8 +8,9 @@ import java.util.UUID;
 
 @Repository
 public interface AccountRepository extends MongoRepository<AccountDocument, UUID> {
-    AccountDocument findByLogin(String login);
-    AccountDocument findByAccountId(UUID id);
-    boolean existsById(UUID id);
-    void deleteByAccountId(UUID id);
+    AccountDocument findAccountDocumentByLogin(String login);
+    AccountDocument findAccountDocumentByAccountId(UUID id);
+    boolean existsAccountDocumentByLogin(String login);
+    boolean existsAccountDocumentByAccountId(UUID id);
+    void deleteAccountDocumentByAccountId(UUID id);
 }

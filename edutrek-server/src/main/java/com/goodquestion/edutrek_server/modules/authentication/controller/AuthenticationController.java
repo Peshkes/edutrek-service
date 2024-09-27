@@ -1,9 +1,6 @@
 package com.goodquestion.edutrek_server.modules.authentication.controller;
 
-import com.goodquestion.edutrek_server.modules.authentication.dto.AddNewAccountRequestDto;
-import com.goodquestion.edutrek_server.modules.authentication.dto.AuthenticationDataDto;
-import com.goodquestion.edutrek_server.modules.authentication.dto.AuthenticationResultDto;
-import com.goodquestion.edutrek_server.modules.authentication.dto.PublicAccountDataDto;
+import com.goodquestion.edutrek_server.modules.authentication.dto.*;
 import com.goodquestion.edutrek_server.modules.authentication.service.AuthenticationService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -62,6 +59,18 @@ public class AuthenticationController {
     public ResponseEntity<String> addNewAccount(@Valid @RequestBody AddNewAccountRequestDto addNewAccountRequestDto) {
         authenticationService.addNewAccount(addNewAccountRequestDto);
         return new ResponseEntity<>("Account created", HttpStatus.CREATED);
+    }
+
+    @PutMapping("/password/{id}")
+    public ResponseEntity<String> changePassword(@PathVariable UUID id, @Valid @RequestBody ChangePasswordRequestDto changePasswordRequest) {
+        authenticationService.changePassword(id, changePasswordRequest);
+        return new ResponseEntity<>("Password changed", HttpStatus.OK);
+    }
+
+    @PutMapping("/login/{id}")
+    public ResponseEntity<String> changePassword(@PathVariable UUID id, @Valid @RequestBody ChangeLoginRequestDto changeLoginRequest) {
+        authenticationService.changeLogin(id, changeLoginRequest);
+        return new ResponseEntity<>("Login changed", HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

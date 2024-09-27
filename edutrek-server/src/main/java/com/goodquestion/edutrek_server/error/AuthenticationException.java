@@ -7,21 +7,9 @@ public class AuthenticationException extends RuntimeException {
         super(message);
     }
 
-    public static class TokenExpiredException extends AuthenticationException {
-        public TokenExpiredException() {
-            super("Access token has expired and refresh token is not available.");
-        }
-    }
-
     public static class UserNotFoundException extends AuthenticationException {
         public UserNotFoundException(UUID id) {
             super("User not found with id: " + id);
-        }
-    }
-
-    public static class TokenValidationException extends AuthenticationException {
-        public TokenValidationException(String message) {
-            super("Invalid token: " + message);
         }
     }
 
@@ -46,6 +34,18 @@ public class AuthenticationException extends RuntimeException {
     public static class NoAccountsException extends AuthenticationException {
         public NoAccountsException() {
             super("No accounts found.");
+        }
+    }
+
+    public static class LoginAlreadyExistsException extends AuthenticationException {
+        public LoginAlreadyExistsException(String login) {
+            super("Account already exists with login: " + login);
+        }
+    }
+
+    public static class PasswordAlreadyUsedException extends AuthenticationException {
+        public PasswordAlreadyUsedException() {
+            super("Password already used. Please try again.");
         }
     }
 }

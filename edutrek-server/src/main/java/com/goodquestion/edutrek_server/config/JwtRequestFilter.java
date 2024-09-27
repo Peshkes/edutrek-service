@@ -1,6 +1,5 @@
 package com.goodquestion.edutrek_server.config;
 
-import com.goodquestion.edutrek_server.error.AuthenticationException;
 import com.goodquestion.edutrek_server.modules.authentication.service.AuthenticationService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -30,12 +29,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
         String username = null;
         String jwt = null;
+
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             jwt = authHeader.substring(7);
             try {
                 username = jwtService.getUsername(jwt);
             } catch (ExpiredJwtException e) {
-                // If access token is expired, try to refresh it using the refresh token
                 String refreshToken = getRefreshToken(request);
                 if (refreshToken != null) {
                     username = jwtService.getUsername(refreshToken);
@@ -45,16 +44,30 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                         try {
                             userDetails = authenticationService.loadUserByUsername(username);
                             newAccessToken = jwtService.generateAccessToken(userDetails);
-                            response.setHeader("Authorization", "Bearer " + newAccessToken);
+                            if (!response.isCommitted()) {
+                                response.setHeader("Authorization", "Bearer " + newAccessToken);
+                            }
                         } catch (Exception exception) {
-                            throw new AuthenticationException.UsernameNotFoundException(username);
+                            if (!response.isCommitted()) {
+                                logger.error("User not found with username: " + username);
+                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not found with username: " + username);
+                            }
+                            return;
                         }
                     }
                 } else {
-                    throw new AuthenticationException.TokenExpiredException();
+                    if (!response.isCommitted()) {
+                        logger.error("Access token has expired and refresh token is not available.");
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Access token has expired and refresh token is not available.");
+                    }
+                    return;
                 }
             } catch (Exception e) {
-                throw new AuthenticationException.TokenValidationException(e.getMessage());
+                if (!response.isCommitted()) {
+                    logger.error("Invalid token: " +  e.getMessage());
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token: " +  e.getMessage());
+                }
+                return;
             }
         }
 
@@ -69,7 +82,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(token);
         }
 
-        filterChain.doFilter(request, response);
+        if (!response.isCommitted()) {
+            filterChain.doFilter(request, response);
+        }
     }
 
     public String getRefreshToken(HttpServletRequest request) {

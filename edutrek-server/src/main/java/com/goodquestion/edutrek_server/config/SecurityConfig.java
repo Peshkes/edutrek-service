@@ -1,8 +1,10 @@
 package com.goodquestion.edutrek_server.config;
 
+import com.goodquestion.edutrek_server.authorization_manager.OwnerAuthorizationManager;
+import com.goodquestion.edutrek_server.authorization_manager.OwnerOrPrincipalAuthorizationManager;
 import com.goodquestion.edutrek_server.modules.authentication.entities.Roles;
 import com.goodquestion.edutrek_server.modules.authentication.service.AuthenticationService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,7 +13,8 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
@@ -25,21 +28,25 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtRequestFilter jwtRequestFilter;
     private final AuthenticationService authenticationService;
+    private final OwnerOrPrincipalAuthorizationManager ownerOrPrincipalAuthorizationManager;
+    private final OwnerAuthorizationManager ownerAuthorizationManager;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((authorizeHttpRequests) ->
                 authorizeHttpRequests
                         .requestMatchers(HttpMethod.GET,"/auth/csrf").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/auth", "/auth/{id}").hasRole(Roles.ROLE_PRINCIPAL.getShortValue())
-                        .requestMatchers(HttpMethod.POST,"/auth").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/auth").hasRole(Roles.ROLE_PRINCIPAL.getShortValue())
+                        .requestMatchers(HttpMethod.GET, "/auth/{id}").access(ownerOrPrincipalAuthorizationManager)
                         .requestMatchers(HttpMethod.POST, "/auth/account").hasRole(Roles.ROLE_PRINCIPAL.getShortValue())
+                        .requestMatchers(HttpMethod.POST,"/auth").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/auth/{id}").hasRole(Roles.ROLE_PRINCIPAL.getShortValue())
-                        .anyRequest().permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/auth/login/{id}", "/auth/password/{id}").access(ownerAuthorizationManager)
+                .anyRequest().permitAll()
         );
         http.csrf(csrf -> csrfTokenRepository());
         http.cors(cors -> corsConfigurationSource());
@@ -76,8 +83,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public static BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public static PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
     @Bean
