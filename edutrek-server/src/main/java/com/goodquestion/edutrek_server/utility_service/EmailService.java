@@ -47,7 +47,7 @@ public class EmailService {
     }
 
     public void sendRegistrationEmail(String toEmail, String login, String password) throws MessagingException, IOException {
-        ClassPathResource resource = new ClassPathResource("registration.jpg");
+        ClassPathResource resource = new ClassPathResource("registration.webp");
         byte[] imageBytes = Files.readAllBytes(resource.getFile().toPath());
         String base64Image = Base64.getEncoder().encodeToString(imageBytes);
 

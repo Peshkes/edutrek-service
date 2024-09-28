@@ -46,7 +46,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/auth").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/auth/{id}").hasRole(Roles.ROLE_PRINCIPAL.getShortValue())
                         .requestMatchers(HttpMethod.PUT, "/auth/login/{id}", "/auth/password/{id}").access(ownerAuthorizationManager)
-                .anyRequest().permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/branches", "/branches/{id}").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/branches").hasRole(Roles.ROLE_PRINCIPAL.getShortValue())
+                        .requestMatchers(HttpMethod.DELETE, "/branches/{id}").hasRole(Roles.ROLE_PRINCIPAL.getShortValue())
+                        .requestMatchers(HttpMethod.PUT, "/branches/{id}").hasRole(Roles.ROLE_PRINCIPAL.getShortValue())
+                .anyRequest().denyAll()
         );
         http.csrf(csrf -> csrfTokenRepository());
         http.cors(cors -> corsConfigurationSource());
