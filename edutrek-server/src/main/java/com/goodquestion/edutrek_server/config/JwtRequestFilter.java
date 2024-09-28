@@ -1,6 +1,7 @@
 package com.goodquestion.edutrek_server.config;
 
 import com.goodquestion.edutrek_server.modules.authentication.service.AuthenticationService;
+import com.goodquestion.edutrek_server.utility_service.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

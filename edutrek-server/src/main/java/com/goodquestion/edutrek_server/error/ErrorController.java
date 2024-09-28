@@ -1,5 +1,6 @@
 package com.goodquestion.edutrek_server.error;
 
+import com.goodquestion.edutrek_server.error.AuthenticationException.*;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSourceResolvable;
@@ -12,8 +13,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-
-import com.goodquestion.edutrek_server.error.AuthenticationException.*;
 
 import java.util.stream.Collectors;
 

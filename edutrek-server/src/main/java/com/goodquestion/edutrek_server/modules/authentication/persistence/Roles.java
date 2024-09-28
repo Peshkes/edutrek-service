@@ -1,4 +1,4 @@
-package com.goodquestion.edutrek_server.modules.authentication.entities;
+package com.goodquestion.edutrek_server.modules.authentication.persistence;
 
 import lombok.Getter;
 

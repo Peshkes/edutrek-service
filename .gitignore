@@ -34,3 +34,6 @@ build/
 
 ### DataBase ###
 server-data
+
+### Properties ###
+edutrek-server/src/main/resources/application.properties

@@ -2,7 +2,7 @@ package com.goodquestion.edutrek_server.config;
 
 import com.goodquestion.edutrek_server.authorization_manager.OwnerAuthorizationManager;
 import com.goodquestion.edutrek_server.authorization_manager.OwnerOrPrincipalAuthorizationManager;
-import com.goodquestion.edutrek_server.modules.authentication.entities.Roles;
+import com.goodquestion.edutrek_server.modules.authentication.persistence.Roles;
 import com.goodquestion.edutrek_server.modules.authentication.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

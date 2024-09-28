@@ -1,6 +1,6 @@
 package com.goodquestion.edutrek_server.authorization_manager;
 
-import com.goodquestion.edutrek_server.modules.authentication.repositories.AccountRepository;
+import com.goodquestion.edutrek_server.modules.authentication.persistence.AccountRepository;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.core.Authentication;

@@ -16,4 +16,10 @@ public class DatabaseException extends RuntimeException {
             super("Database error while deleting: " + message);
         }
     }
+
+    public static class DatabaseUpdatingException extends DatabaseException {
+        public DatabaseUpdatingException(String message) {
+            super("Database error while updating: " + message);
+        }
+    }
 }

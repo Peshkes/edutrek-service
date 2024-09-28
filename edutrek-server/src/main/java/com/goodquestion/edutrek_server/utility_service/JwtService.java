@@ -1,4 +1,4 @@
-package com.goodquestion.edutrek_server.config;
+package com.goodquestion.edutrek_server.utility_service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

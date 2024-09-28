@@ -1,8 +1,8 @@
 package com.goodquestion.edutrek_server.initialisation;
 
-import com.goodquestion.edutrek_server.modules.authentication.entities.AccountDocument;
-import com.goodquestion.edutrek_server.modules.authentication.entities.Roles;
-import com.goodquestion.edutrek_server.modules.authentication.repositories.AccountRepository;
+import com.goodquestion.edutrek_server.modules.authentication.persistence.AccountDocument;
+import com.goodquestion.edutrek_server.modules.authentication.persistence.Roles;
+import com.goodquestion.edutrek_server.modules.authentication.persistence.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;

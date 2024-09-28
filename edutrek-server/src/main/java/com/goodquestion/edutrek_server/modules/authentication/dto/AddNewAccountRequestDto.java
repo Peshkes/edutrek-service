@@ -1,6 +1,6 @@
 package com.goodquestion.edutrek_server.modules.authentication.dto;
 
-import com.goodquestion.edutrek_server.modules.authentication.entities.Roles;
+import com.goodquestion.edutrek_server.modules.authentication.persistence.Roles;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

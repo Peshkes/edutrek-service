@@ -1,16 +1,15 @@
 package com.goodquestion.edutrek_server.modules.authentication.service;
 
-import com.goodquestion.edutrek_server.config.JwtService;
 import com.goodquestion.edutrek_server.config.SecurityConfig;
 import com.goodquestion.edutrek_server.error.AuthenticationException.*;
-import com.goodquestion.edutrek_server.error.DatabaseException.DatabaseAddingException;
-import com.goodquestion.edutrek_server.error.DatabaseException.DatabaseDeletingException;
+import com.goodquestion.edutrek_server.error.DatabaseException.*;
 import com.goodquestion.edutrek_server.modules.authentication.dto.*;
-import com.goodquestion.edutrek_server.modules.authentication.entities.AccountDocument;
-import com.goodquestion.edutrek_server.modules.authentication.entities.Roles;
-import com.goodquestion.edutrek_server.modules.authentication.repositories.AccountRepository;
+import com.goodquestion.edutrek_server.modules.authentication.persistence.AccountDocument;
+import com.goodquestion.edutrek_server.modules.authentication.persistence.AccountRepository;
+import com.goodquestion.edutrek_server.modules.authentication.persistence.Roles;
+import com.goodquestion.edutrek_server.utility_service.EmailService;
+import com.goodquestion.edutrek_server.utility_service.JwtService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -25,15 +24,15 @@ import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class AuthenticationService implements UserDetailsService {
 
     private final AccountRepository accountRepository;
     private final JwtService jwtService;
+    private final EmailService emailService;
 
-    public PublicAccountDataDto getAccountById(UUID id){
+    public PublicAccountDataDto getAccountById(UUID id) {
         AccountDocument accountDocument = accountRepository.findAccountDocumentByAccountId(id);
         if (accountDocument == null)
             throw new UserNotFoundException(id);
@@ -49,7 +48,7 @@ public class AuthenticationService implements UserDetailsService {
             return new PublicAccountDataDto(accountDocument.getAccountId(), accountDocument.getEmail(), accountDocument.getLogin(), accountDocument.getName(), accountDocument.getRoles());
     }
 
-    public List<PublicAccountDataDto> getAllAccounts(){
+    public List<PublicAccountDataDto> getAllAccounts() {
         List<AccountDocument> accountDocuments = accountRepository.findAll();
         if (accountDocuments.isEmpty())
             throw new NoAccountsException();
@@ -73,19 +72,26 @@ public class AuthenticationService implements UserDetailsService {
     }
 
     @Transactional
-    public void addNewAccount(AddNewAccountRequestDto addNewAccountRequestDto){
+    public void addNewAccount(AddNewAccountRequestDto addNewAccountRequestDto) {
         String email = addNewAccountRequestDto.getEmail();
         String login = generateLogin(extractLoginFromEmail(email));
-        AccountDocument accountDocument = new AccountDocument(email, login, addNewAccountRequestDto.getName(), generatePassword(), addNewAccountRequestDto.getRoles());
+        String password = generatePassword();
+        AccountDocument accountDocument = new AccountDocument(email, login, addNewAccountRequestDto.getName(), password, addNewAccountRequestDto.getRoles());
         try {
             accountRepository.save(accountDocument);
         } catch (Exception e) {
             throw new DatabaseAddingException(e.getMessage());
         }
+        try {
+            emailService.sendRegistrationEmail(email, login, password);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+
     }
 
     @Transactional
-    public void deleteAccount(UUID id){
+    public void deleteAccount(UUID id) {
         if (!accountRepository.existsAccountDocumentByAccountId(id))
             throw new UserNotFoundException(id);
         try {
@@ -124,7 +130,11 @@ public class AuthenticationService implements UserDetailsService {
             accountDocument.setPassword(encodedNewPassword);
             accountDocument.setLastPasswords(lastPasswords);
             accountDocument.setLastPasswordChange(new Date());
-            accountRepository.save(accountDocument);
+            try {
+                accountRepository.save(accountDocument);
+            } catch (Exception e){
+                throw new DatabaseUpdatingException(e.getMessage());
+            }
         } else {
             throw new UserNotFoundException(id);
         }
@@ -134,9 +144,13 @@ public class AuthenticationService implements UserDetailsService {
         AccountDocument accountDocument = accountRepository.findAccountDocumentByAccountId(id);
         if (accountDocument != null) {
             String login = changeLoginRequest.getLogin();
-            if (!accountRepository.existsAccountDocumentByLogin(login)){
+            if (!accountRepository.existsAccountDocumentByLogin(login)) {
                 accountDocument.setLogin(login);
-                accountRepository.save(accountDocument);
+                try {
+                    accountRepository.save(accountDocument);
+                } catch (Exception e){
+                    throw new DatabaseUpdatingException(e.getMessage());
+                }
             } else
                 throw new LoginAlreadyExistsException(login);
         } else

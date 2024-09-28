@@ -1,6 +1,5 @@
-package com.goodquestion.edutrek_server.modules.authentication.repositories;
+package com.goodquestion.edutrek_server.modules.authentication.persistence;
 
-import com.goodquestion.edutrek_server.modules.authentication.entities.AccountDocument;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
