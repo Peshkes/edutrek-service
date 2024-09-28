@@ -10,11 +10,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.UUID;
 
+import java.util.List;
+import org.hibernate.validator.constraints.UUID;
+
+@Validated
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -34,15 +37,21 @@ public class AuthenticationController {
         return (CsrfToken) request.getAttribute(CsrfToken.class.getName());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public PublicAccountDataDto getAccountById(@PathVariable UUID id) {
-        return authenticationService.getAccountById(id);
+    public PublicAccountDataDto getAccountById(@PathVariable @UUID String id) {
+        return authenticationService.getAccountById(java.util.UUID.fromString(id));
+    }
+
+    @GetMapping("/login/{login}")
+    @ResponseStatus(HttpStatus.OK)
+    public PublicAccountDataDto getAccountByLogin(@PathVariable String login) {
+        return authenticationService.getAccountByLogin(login);
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> signIn(@RequestBody AuthenticationDataDto authenticationDataDto, HttpServletResponse response) {
+    public ResponseEntity<String> signIn(@Valid @RequestBody AuthenticationDataDto authenticationDataDto, HttpServletResponse response) {
         AuthenticationResultDto result = authenticationService.signIn(authenticationDataDto);
 
         Cookie refreshCookie = new Cookie("refreshToken", result.getRefreshToken());
@@ -62,21 +71,21 @@ public class AuthenticationController {
     }
 
     @PutMapping("/password/{id}")
-    public ResponseEntity<String> changePassword(@PathVariable UUID id, @Valid @RequestBody ChangePasswordRequestDto changePasswordRequest) {
-        authenticationService.changePassword(id, changePasswordRequest);
+    public ResponseEntity<String> changePassword(@PathVariable @UUID String id, @Valid @RequestBody ChangePasswordRequestDto changePasswordRequest) {
+        authenticationService.changePassword(java.util.UUID.fromString(id), changePasswordRequest);
         return new ResponseEntity<>("Password changed", HttpStatus.OK);
     }
 
     @PutMapping("/login/{id}")
-    public ResponseEntity<String> changePassword(@PathVariable UUID id, @Valid @RequestBody ChangeLoginRequestDto changeLoginRequest) {
-        authenticationService.changeLogin(id, changeLoginRequest);
+    public ResponseEntity<String> changePassword(@PathVariable @UUID String id, @Valid @RequestBody ChangeLoginRequestDto changeLoginRequest) {
+        authenticationService.changeLogin(java.util.UUID.fromString(id), changeLoginRequest);
         return new ResponseEntity<>("Login changed", HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<String> deleteAccount(@PathVariable UUID id) {
-        authenticationService.deleteAccount(id);
+    public ResponseEntity<String> deleteAccount(@PathVariable @UUID String id) {
+        authenticationService.deleteAccount(java.util.UUID.fromString(id));
         return ResponseEntity.ok("Account deleted");
     }
 }

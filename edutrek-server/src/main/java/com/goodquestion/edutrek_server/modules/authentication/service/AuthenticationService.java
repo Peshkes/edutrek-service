@@ -41,6 +41,14 @@ public class AuthenticationService implements UserDetailsService {
             return new PublicAccountDataDto(accountDocument.getAccountId(), accountDocument.getEmail(), accountDocument.getLogin(), accountDocument.getName(), accountDocument.getRoles());
     }
 
+    public PublicAccountDataDto getAccountByLogin(String login) {
+        AccountDocument accountDocument = accountRepository.findAccountDocumentByLogin(login);
+        if (accountDocument == null)
+            throw new UsernameNotFoundException(login);
+        else
+            return new PublicAccountDataDto(accountDocument.getAccountId(), accountDocument.getEmail(), accountDocument.getLogin(), accountDocument.getName(), accountDocument.getRoles());
+    }
+
     public List<PublicAccountDataDto> getAllAccounts(){
         List<AccountDocument> accountDocuments = accountRepository.findAll();
         if (accountDocuments.isEmpty())

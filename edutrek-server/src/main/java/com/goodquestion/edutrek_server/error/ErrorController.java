@@ -1,5 +1,6 @@
 package com.goodquestion.edutrek_server.error;
 
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -90,6 +91,11 @@ public class ErrorController  {
     }
     @ExceptionHandler(IllegalArgumentException.class)
     ResponseEntity<String> illegalArgumentException(IllegalArgumentException e) {
+        return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    ResponseEntity<String> constraintViolationException(ConstraintViolationException e) {
         return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
