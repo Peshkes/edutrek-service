@@ -1,7 +1,7 @@
 package com.goodquestion.edutrek_server.modules.authentication.entities;
 
 import com.goodquestion.edutrek_server.config.SecurityConfig;
-import jakarta.persistence.Id;
+import org.springframework.data.annotation.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

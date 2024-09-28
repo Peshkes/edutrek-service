@@ -11,9 +11,6 @@ import com.goodquestion.edutrek_server.modules.authentication.entities.Roles;
 import com.goodquestion.edutrek_server.modules.authentication.repositories.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -28,8 +25,6 @@ import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.springframework.data.mongodb.core.query.Query.query;
-
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -37,9 +32,8 @@ public class AuthenticationService implements UserDetailsService {
 
     private final AccountRepository accountRepository;
     private final JwtService jwtService;
-    private final MongoTemplate mongoTemplate;
 
-    public PublicAccountDataDto getAccountById(UUID id) {
+    public PublicAccountDataDto getAccountById(UUID id){
         AccountDocument accountDocument = accountRepository.findAccountDocumentByAccountId(id);
         if (accountDocument == null)
             throw new UserNotFoundException(id);
@@ -47,7 +41,7 @@ public class AuthenticationService implements UserDetailsService {
             return new PublicAccountDataDto(accountDocument.getAccountId(), accountDocument.getEmail(), accountDocument.getLogin(), accountDocument.getName(), accountDocument.getRoles());
     }
 
-    public List<PublicAccountDataDto> getAllAccounts() {
+    public List<PublicAccountDataDto> getAllAccounts(){
         List<AccountDocument> accountDocuments = accountRepository.findAll();
         if (accountDocuments.isEmpty())
             throw new NoAccountsException();
@@ -71,7 +65,7 @@ public class AuthenticationService implements UserDetailsService {
     }
 
     @Transactional
-    public void addNewAccount(AddNewAccountRequestDto addNewAccountRequestDto) {
+    public void addNewAccount(AddNewAccountRequestDto addNewAccountRequestDto){
         String email = addNewAccountRequestDto.getEmail();
         String login = generateLogin(extractLoginFromEmail(email));
         AccountDocument accountDocument = new AccountDocument(email, login, addNewAccountRequestDto.getName(), generatePassword(), addNewAccountRequestDto.getRoles());
@@ -83,7 +77,7 @@ public class AuthenticationService implements UserDetailsService {
     }
 
     @Transactional
-    public void deleteAccount(UUID id) {
+    public void deleteAccount(UUID id){
         if (!accountRepository.existsAccountDocumentByAccountId(id))
             throw new UserNotFoundException(id);
         try {
@@ -93,16 +87,18 @@ public class AuthenticationService implements UserDetailsService {
         }
     }
 
-    @Transactional
     public void changePassword(UUID id, ChangePasswordRequestDto changePasswordRequest) {
         AccountDocument accountDocument = accountRepository.findAccountDocumentByAccountId(id);
+
         if (accountDocument != null) {
             LinkedList<String> lastPasswords = accountDocument.getLastPasswords();
             String newPassword = changePasswordRequest.getPassword();
 
             PasswordEncoder passwordEncoder = SecurityConfig.passwordEncoder();
 
-            if (passwordEncoder.matches(newPassword, accountDocument.getPassword())) {throw new PasswordAlreadyUsedException();}
+            if (passwordEncoder.matches(newPassword, accountDocument.getPassword())) {
+                throw new PasswordAlreadyUsedException();
+            }
 
             for (String oldPassword : lastPasswords) {
                 if (passwordEncoder.matches(newPassword, oldPassword)) {
@@ -113,43 +109,28 @@ public class AuthenticationService implements UserDetailsService {
             String encodedNewPassword = passwordEncoder.encode(newPassword);
             lastPasswords.add(accountDocument.getPassword());
 
-            Update update = new Update()
-                    .set("password", encodedNewPassword)
-                    .set("lastPasswordChange", new Date())
-                    .push("lastPasswords", accountDocument.getPassword());
+            if (lastPasswords.size() > 5) {
+                lastPasswords.removeFirst();
+            }
 
-            mongoTemplate.updateFirst(
-                    query(Criteria.where("accountId").is(id)),
-                    update,
-                    AccountDocument.class
-            );
-
-            mongoTemplate.updateFirst(
-                    query(Criteria.where("accountId").is(id)),
-                    new Update().set("lastPasswords", lastPasswords.subList(Math.max(lastPasswords.size() - 5, 0), lastPasswords.size())),
-                    AccountDocument.class
-            );
-        } else
+            accountDocument.setPassword(encodedNewPassword);
+            accountDocument.setLastPasswords(lastPasswords);
+            accountDocument.setLastPasswordChange(new Date());
+            accountRepository.save(accountDocument);
+        } else {
             throw new UserNotFoundException(id);
+        }
     }
 
-    @Transactional
     public void changeLogin(UUID id, ChangeLoginRequestDto changeLoginRequest) {
         AccountDocument accountDocument = accountRepository.findAccountDocumentByAccountId(id);
         if (accountDocument != null) {
-            String newLogin = changeLoginRequest.getLogin();
-
-            if (!accountRepository.existsAccountDocumentByLogin(newLogin)) {
-                Update update = new Update()
-                        .set("login", newLogin);
-
-                mongoTemplate.updateFirst(
-                        query(Criteria.where("accountId").is(id)),
-                        update,
-                        AccountDocument.class
-                );
+            String login = changeLoginRequest.getLogin();
+            if (!accountRepository.existsAccountDocumentByLogin(login)){
+                accountDocument.setLogin(login);
+                accountRepository.save(accountDocument);
             } else
-                throw new LoginAlreadyExistsException(newLogin);
+                throw new LoginAlreadyExistsException(login);
         } else
             throw new UserNotFoundException(id);
     }
