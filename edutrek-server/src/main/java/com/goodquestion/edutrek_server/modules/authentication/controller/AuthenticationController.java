@@ -1,6 +1,7 @@
 package com.goodquestion.edutrek_server.modules.authentication.controller;
 
 import com.goodquestion.edutrek_server.modules.authentication.dto.*;
+import com.goodquestion.edutrek_server.modules.authentication.persistence.AccountDocument;
 import com.goodquestion.edutrek_server.modules.authentication.service.AuthenticationService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
+
 import org.hibernate.validator.constraints.UUID;
 
 @Validated
@@ -70,6 +72,12 @@ public class AuthenticationController {
         return new ResponseEntity<>("Account created", HttpStatus.CREATED);
     }
 
+    @PostMapping("/rollback")
+    public ResponseEntity<String> rollback(@RequestBody AccountDocument accountDocument) {
+        String name = authenticationService.rollback(accountDocument);
+        return new ResponseEntity<>("Account " + name + " rolled back", HttpStatus.CREATED);
+    }
+
     @PutMapping("/password/{id}")
     public ResponseEntity<String> changePassword(@PathVariable @UUID String id, @Valid @RequestBody ChangePasswordRequestDto changePasswordRequest) {
         authenticationService.changePassword(java.util.UUID.fromString(id), changePasswordRequest);
@@ -84,8 +92,7 @@ public class AuthenticationController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<String> deleteAccount(@PathVariable @UUID String id) {
-        authenticationService.deleteAccount(java.util.UUID.fromString(id));
-        return ResponseEntity.ok("Account deleted");
+    public AccountDocument deleteAccount(@PathVariable @UUID String id) {
+        return authenticationService.deleteAccount(java.util.UUID.fromString(id));
     }
 }

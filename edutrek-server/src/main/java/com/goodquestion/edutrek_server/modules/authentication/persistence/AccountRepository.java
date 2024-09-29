@@ -11,5 +11,5 @@ public interface AccountRepository extends MongoRepository<AccountDocument, UUID
     AccountDocument findAccountDocumentByAccountId(UUID id);
     boolean existsAccountDocumentByLogin(String login);
     boolean existsAccountDocumentByAccountId(UUID id);
-    void deleteAccountDocumentByAccountId(UUID id);
+    AccountDocument deleteAccountDocumentByAccountId(UUID id);
 }

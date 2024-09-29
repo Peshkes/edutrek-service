@@ -2,7 +2,9 @@ package com.goodquestion.edutrek_server.modules.authentication.service;
 
 import com.goodquestion.edutrek_server.config.SecurityConfig;
 import com.goodquestion.edutrek_server.error.AuthenticationException.*;
-import com.goodquestion.edutrek_server.error.DatabaseException.*;
+import com.goodquestion.edutrek_server.error.DatabaseException.DatabaseAddingException;
+import com.goodquestion.edutrek_server.error.DatabaseException.DatabaseDeletingException;
+import com.goodquestion.edutrek_server.error.DatabaseException.DatabaseUpdatingException;
 import com.goodquestion.edutrek_server.modules.authentication.dto.*;
 import com.goodquestion.edutrek_server.modules.authentication.persistence.AccountDocument;
 import com.goodquestion.edutrek_server.modules.authentication.persistence.AccountRepository;
@@ -91,11 +93,11 @@ public class AuthenticationService implements UserDetailsService {
     }
 
     @Transactional
-    public void deleteAccount(UUID id) {
+    public AccountDocument deleteAccount(UUID id) {
         if (!accountRepository.existsAccountDocumentByAccountId(id))
             throw new UserNotFoundException(id);
         try {
-            accountRepository.deleteAccountDocumentByAccountId(id);
+            return accountRepository.deleteAccountDocumentByAccountId(id);
         } catch (Exception e) {
             throw new DatabaseDeletingException(e.getMessage());
         }
@@ -155,6 +157,15 @@ public class AuthenticationService implements UserDetailsService {
                 throw new LoginAlreadyExistsException(login);
         } else
             throw new UserNotFoundException(id);
+    }
+
+    public String rollback(AccountDocument accountDocument) {
+        try {
+            accountRepository.save(accountDocument);
+        } catch (Exception e){
+            throw new DatabaseAddingException(e.getMessage());
+        }
+        return accountDocument.getName();
     }
 
     // UTILITY
