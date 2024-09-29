@@ -1,6 +1,5 @@
 package com.goodquestion.edutrek_server.config;
 
-import com.goodquestion.edutrek_server.modules.authentication.service.AuthenticationService;
 import com.goodquestion.edutrek_server.utility_service.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -23,7 +22,7 @@ import java.util.stream.Collectors;
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
     private JwtService jwtService;
-    private AuthenticationService authenticationService;
+    private UserConfig userConfig;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -43,7 +42,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                         UserDetails userDetails;
                         String newAccessToken;
                         try {
-                            userDetails = authenticationService.loadUserByUsername(username);
+                            userDetails = userConfig.loadUserByUsername(username);
                             newAccessToken = jwtService.generateAccessToken(userDetails);
                             if (!response.isCommitted()) {
                                 response.setHeader("Authorization", "Bearer " + newAccessToken);

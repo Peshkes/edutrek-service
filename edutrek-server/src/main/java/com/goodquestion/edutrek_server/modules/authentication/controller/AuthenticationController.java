@@ -2,22 +2,20 @@ package com.goodquestion.edutrek_server.modules.authentication.controller;
 
 import com.goodquestion.edutrek_server.modules.authentication.dto.*;
 import com.goodquestion.edutrek_server.modules.authentication.persistence.AccountDocument;
-import com.goodquestion.edutrek_server.modules.authentication.service.AuthenticationService;
+import com.goodquestion.edutrek_server.modules.authentication.service.AuthenticationJWTService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.util.List;
-
-import org.hibernate.validator.constraints.UUID;
 
 @Validated
 @RestController
@@ -25,7 +23,8 @@ import org.hibernate.validator.constraints.UUID;
 @RequiredArgsConstructor
 public class AuthenticationController {
 
-    private final AuthenticationService authenticationService;
+    private final AuthenticationJWTService authenticationService;
+//    private final AuthenticationBaseService authenticationService;
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)

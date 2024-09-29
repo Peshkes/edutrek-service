@@ -18,17 +18,13 @@ public abstract class OwnerAbstractAuthorizationManager {
         this.accountRepository = accountRepository;
     }
 
-    protected AccountDocument getAccountDocument(UUID accountId) {
-        return accountRepository.findAccountDocumentByAccountId(accountId);
-    }
-
     protected AuthorizationDecision checkOwnership(Supplier<Authentication> authenticationSupplier, UUID accountId) {
         Authentication authentication = authenticationSupplier.get();
         if (authentication == null || !authentication.isAuthenticated()) {
             return new AuthorizationDecision(false);
         }
 
-        AccountDocument accountDocument = getAccountDocument(accountId);
+        AccountDocument accountDocument = accountRepository.findById(accountId).orElse(null);
         if (accountDocument != null) {
             String username = authentication.getName();
             boolean isOwner = accountDocument.getLogin().equals(username);

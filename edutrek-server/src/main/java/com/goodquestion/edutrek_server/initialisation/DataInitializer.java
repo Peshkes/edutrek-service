@@ -32,7 +32,7 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) {
 
         if (accountRepository.count() == 0) {
-            AccountDocument user = new AccountDocument(email, login, name, password, List.of(Roles.ROLE_PRINCIPAL, Roles.ROLE_MANAGER));
+            AccountDocument user = new AccountDocument(email, login, name, password, List.of(Roles.PRINCIPAL, Roles.MANAGER));
             accountRepository.save(user);
         }
     }
