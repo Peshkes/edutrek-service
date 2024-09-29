@@ -11,6 +11,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -43,7 +44,7 @@ public class SecurityConfig {
                 authorizeHttpRequests
                         .requestMatchers(HttpMethod.GET,"/auth/csrf").permitAll()
                         .requestMatchers(HttpMethod.GET,"/auth").hasRole(PRINCIPAL.toString())
-                        .requestMatchers(HttpMethod.GET, "/auth/{id}").access(ownerOrPrincipalAuthorizationManager)
+                        .requestMatchers(HttpMethod.GET, "/auth/id/{id}", "/auth/login/{login}").access(ownerOrPrincipalAuthorizationManager)
                         .requestMatchers(HttpMethod.POST, "/auth/account", "/auth/rollback").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.POST,"/auth").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/auth/{id}").hasRole(PRINCIPAL.toString())
@@ -55,7 +56,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/branches/{id}").hasRole(PRINCIPAL.toString())
                 .anyRequest().denyAll()
         );
-        http.csrf(csrf -> csrfTokenRepository());
+//        http.csrf(csrf -> csrfTokenRepository());
+        http.csrf(AbstractHttpConfigurer::disable);
         http.cors(cors -> corsConfigurationSource());
         http.addFilterBefore(expiredPasswordFilter, BasicAuthenticationFilter.class);
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

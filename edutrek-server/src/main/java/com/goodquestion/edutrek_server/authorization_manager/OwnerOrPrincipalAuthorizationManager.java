@@ -25,15 +25,12 @@ public class OwnerOrPrincipalAuthorizationManager extends OwnerAbstractAuthoriza
         String pathVariableId = context.getVariables().get("id");
         UUID accountId = UUID.fromString(pathVariableId);
 
-        log.info("I AM IN!!!");
-
         AuthorizationDecision ownershipDecision = checkOwnership(authenticationSupplier, accountId);
         if (ownershipDecision.isGranted()) {
             return ownershipDecision;
         }
 
         Authentication authentication = authenticationSupplier.get();
-        log.info(authentication.getAuthorities().toString());
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_" + Roles.PRINCIPAL));
 
