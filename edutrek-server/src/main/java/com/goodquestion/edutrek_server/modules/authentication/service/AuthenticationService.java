@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -131,7 +132,7 @@ public class AuthenticationService implements UserDetailsService {
 
             accountDocument.setPassword(encodedNewPassword);
             accountDocument.setLastPasswords(lastPasswords);
-            accountDocument.setLastPasswordChange(new Date());
+            accountDocument.setLastPasswordChange(LocalDate.now());
             try {
                 accountRepository.save(accountDocument);
             } catch (Exception e){

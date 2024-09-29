@@ -1,13 +1,13 @@
 package com.goodquestion.edutrek_server.modules.authentication.persistence;
 
 import com.goodquestion.edutrek_server.config.SecurityConfig;
-import org.springframework.data.annotation.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -25,7 +25,7 @@ public class AccountDocument {
     private String email;
     private String name;
     @Setter
-    private Date lastPasswordChange;
+    private LocalDate lastPasswordChange;
     @Setter
     private LinkedList<String> lastPasswords;
     @Setter
@@ -40,6 +40,6 @@ public class AccountDocument {
         this.password = SecurityConfig.passwordEncoder().encode(password);
         this.roles = roles;
         this.lastPasswords = new LinkedList<>();
-        this.lastPasswordChange = new Date();
+        this.lastPasswordChange = LocalDate.now();
     }
 }

@@ -42,7 +42,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,"/auth/csrf").permitAll()
                         .requestMatchers(HttpMethod.GET,"/auth").hasRole(Roles.ROLE_PRINCIPAL.getShortValue())
                         .requestMatchers(HttpMethod.GET, "/auth/{id}").access(ownerOrPrincipalAuthorizationManager)
-                        .requestMatchers(HttpMethod.POST, "/auth/account").hasRole(Roles.ROLE_PRINCIPAL.getShortValue())
+                        .requestMatchers(HttpMethod.POST, "/auth/account", "/auth/rollback").hasRole(Roles.ROLE_PRINCIPAL.getShortValue())
                         .requestMatchers(HttpMethod.POST,"/auth").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/auth/{id}").hasRole(Roles.ROLE_PRINCIPAL.getShortValue())
                         .requestMatchers(HttpMethod.PUT, "/auth/login/{id}", "/auth/password/{id}").access(ownerAuthorizationManager)

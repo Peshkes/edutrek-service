@@ -91,7 +91,7 @@ public class AuthenticationController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     public AccountDocument deleteAccount(@PathVariable @UUID String id) {
         return authenticationService.deleteAccount(java.util.UUID.fromString(id));
     }
