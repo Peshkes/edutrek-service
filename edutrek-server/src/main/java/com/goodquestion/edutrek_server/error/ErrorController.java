@@ -24,6 +24,16 @@ public class ErrorController  {
     ResponseEntity<String> passwordAlreadyUsedExceptionHandler(PasswordAlreadyUsedException e) {
         return returnResponse(e.getMessage(), HttpStatus.CONFLICT);
     }
+    
+    @ExceptionHandler(RoleExistsException.class)
+    ResponseEntity<String> passwordAlreadyUsedExceptionHandler(RoleExistsException e) {
+    	return returnResponse(e.getMessage(), HttpStatus.CONFLICT);
+    }
+    
+    @ExceptionHandler(RoleNotExistsException.class)
+    ResponseEntity<String> passwordAlreadyUsedExceptionHandler(RoleNotExistsException e) {
+    	return returnResponse(e.getMessage(), HttpStatus.CONFLICT);
+    }
 
     @ExceptionHandler(LoginAlreadyExistsException.class)
     ResponseEntity<String> loginAlreadyExistsExceptionHandler(LoginAlreadyExistsException e) {
