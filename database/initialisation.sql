@@ -48,7 +48,7 @@ CREATE TABLE contacts
     FOREIGN KEY (status_id) REFERENCES statuses (status_id),
     branch_id        int          NOT NULL,
     FOREIGN KEY (branch_id) REFERENCES branches (branch_id),
-    target_course_id int          NOT NULL,
+    target_course_id uuid          NOT NULL,
     FOREIGN KEY (target_course_id) REFERENCES courses (course_id),
     comment          varchar(256)
 );
@@ -92,7 +92,7 @@ CREATE TABLE groups
     start_date       date         NOT NULL,
     finish_date      date         NOT NULL,
     isActive         boolean      NOT NULL,
-    course_id        int          NOT NULL,
+    course_id        uuid          NOT NULL,
     FOREIGN KEY (course_id) REFERENCES courses (course_id),
     slack_link       varchar(256) NOT NULL,
     whats_app_link   varchar(256) NOT NULL,
