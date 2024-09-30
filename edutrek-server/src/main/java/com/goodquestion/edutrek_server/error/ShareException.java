@@ -17,4 +17,10 @@ public class ShareException extends RuntimeException {
             super("Status with id " + id +"was not found");
         }
     }
+
+    public static class CourseNotFoundException extends ShareException {
+        public CourseNotFoundException(String message) {
+            super("Course not found: " + message);
+        }
+    }
 }

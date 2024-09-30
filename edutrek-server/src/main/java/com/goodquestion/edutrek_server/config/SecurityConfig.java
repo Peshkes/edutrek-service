@@ -55,6 +55,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/branches/{id}").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.PUT, "/branches/{id}").hasRole(PRINCIPAL.toString())
 
+                        .requestMatchers(HttpMethod.GET, "/courses", "/courses/{id}").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/courses").hasRole(PRINCIPAL.toString())
+                        .requestMatchers(HttpMethod.DELETE, "/courses/{id}").hasRole(PRINCIPAL.toString())
+                        .requestMatchers(HttpMethod.PUT, "/courses/{id}").hasRole(PRINCIPAL.toString())
+
                         .requestMatchers(HttpMethod.GET, "/statuses", "/statuses/{statusId}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/statuses").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.DELETE, "/statuses/{statusId}").hasRole(PRINCIPAL.toString())

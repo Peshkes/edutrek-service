@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,11 +24,7 @@ public class BranchService {
     }
 
     public BranchEntity getBranchById(int branchId) {
-        Optional<BranchEntity> optionalBranch = branchRepository.findById(branchId);
-        if (optionalBranch.isPresent()) {
-            return optionalBranch.get();
-        }
-        throw new BranchNotFoundException(String.valueOf(branchId));
+        return branchRepository.findById(branchId).orElseThrow(() -> new BranchNotFoundException(String.valueOf(branchId)));
     }
 
     @Transactional
@@ -54,18 +49,13 @@ public class BranchService {
 
     @Transactional
     public void updateBranchById(int branchId, BranchDataDto branchData) {
-        Optional<BranchEntity> optionalBranch = branchRepository.findById(branchId);
-
-        if (optionalBranch.isPresent()) {
-            BranchEntity branchEntity = optionalBranch.get();
-            branchEntity.setBranchName(branchData.getBranchName());
-            branchEntity.setBranchAddress(branchData.getBranchAddress());
-            try {
-                branchRepository.save(branchEntity);
-            } catch (Exception e) {
-                throw new DatabaseUpdatingException(e.getMessage());
-            }
-        } else
-            throw new BranchNotFoundException(String.valueOf(branchId));
+        BranchEntity branchEntity = branchRepository.findById(branchId).orElseThrow(() -> new BranchNotFoundException(String.valueOf(branchId)));
+        branchEntity.setBranchName(branchData.getBranchName());
+        branchEntity.setBranchAddress(branchData.getBranchAddress());
+        try {
+            branchRepository.save(branchEntity);
+        } catch (Exception e) {
+            throw new DatabaseUpdatingException(e.getMessage());
+        }
     }
 }
