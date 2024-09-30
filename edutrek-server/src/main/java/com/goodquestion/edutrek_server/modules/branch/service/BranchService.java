@@ -17,43 +17,43 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BranchService {
 
-    private final BranchRepository branchRepository;
+    private final BranchRepository repository;
 
-    public List<BranchEntity> getAllBranches() {
-        return branchRepository.findAll();
+    public List<BranchEntity> getAll() {
+        return repository.findAll();
     }
 
-    public BranchEntity getBranchById(int branchId) {
-        return branchRepository.findById(branchId).orElseThrow(() -> new BranchNotFoundException(String.valueOf(branchId)));
+    public BranchEntity getById(int branchId) {
+        return repository.findById(branchId).orElseThrow(() -> new BranchNotFoundException(String.valueOf(branchId)));
     }
 
     @Transactional
-    public void addNewBranch(BranchDataDto branchData) {
+    public void addEntity(BranchDataDto branchData) {
         try {
-            branchRepository.save(new BranchEntity(branchData.getBranchName(), branchData.getBranchAddress()));
+            repository.save(new BranchEntity(branchData.getBranchName(), branchData.getBranchAddress()));
         } catch (Exception e) {
             throw new DatabaseAddingException(e.getMessage());
         }
     }
 
     @Transactional
-    public void deleteBranchById(int branchId) {
-        if (!branchRepository.existsById(branchId)) throw new BranchNotFoundException(String.valueOf(branchId));
+    public void deleteById(int branchId) {
+        if (!repository.existsById(branchId)) throw new BranchNotFoundException(String.valueOf(branchId));
 
         try {
-            branchRepository.deleteById(branchId);
+            repository.deleteById(branchId);
         } catch (Exception e) {
             throw new DatabaseDeletingException(e.getMessage());
         }
     }
 
     @Transactional
-    public void updateBranchById(int branchId, BranchDataDto branchData) {
-        BranchEntity branchEntity = branchRepository.findById(branchId).orElseThrow(() -> new BranchNotFoundException(String.valueOf(branchId)));
+    public void updateById(int branchId, BranchDataDto branchData) {
+        BranchEntity branchEntity = repository.findById(branchId).orElseThrow(() -> new BranchNotFoundException(String.valueOf(branchId)));
         branchEntity.setBranchName(branchData.getBranchName());
         branchEntity.setBranchAddress(branchData.getBranchAddress());
         try {
-            branchRepository.save(branchEntity);
+            repository.save(branchEntity);
         } catch (Exception e) {
             throw new DatabaseUpdatingException(e.getMessage());
         }

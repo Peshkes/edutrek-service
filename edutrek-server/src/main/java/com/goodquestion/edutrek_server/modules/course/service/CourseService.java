@@ -18,45 +18,45 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CourseService {
 
-    private final CourseRepository courseRepository;
+    private final CourseRepository repository;
 
-    public List<CourseEntity> getAllCourses() {
-        return courseRepository.findAll();
+    public List<CourseEntity> getAll() {
+        return repository.findAll();
     }
 
     public CourseEntity getCourseById(UUID courseId) {
-        return courseRepository.findById(courseId).orElseThrow(() -> new ShareException.CourseNotFoundException(String.valueOf(courseId)));
+        return repository.findById(courseId).orElseThrow(() -> new ShareException.CourseNotFoundException(String.valueOf(courseId)));
     }
 
     @Transactional
-    public void addNewCourse(CourseDataDto courseData) {
+    public void addEntity(CourseDataDto courseData) {
         try {
-            courseRepository.save(new CourseEntity(courseData.getCourseName(), courseData.getCourseAbbreviation()));
+            repository.save(new CourseEntity(courseData.getCourseName(), courseData.getCourseAbbreviation()));
         } catch (Exception e) {
             throw new DatabaseAddingException(e.getMessage());
         }
     }
 
     @Transactional
-    public void deleteCourseById(UUID courseId) {
-        if (!courseRepository.existsById(courseId))
+    public void deleteById(UUID courseId) {
+        if (!repository.existsById(courseId))
             throw new ShareException.CourseNotFoundException(String.valueOf(courseId));
 
         try {
-            courseRepository.deleteById(courseId);
+            repository.deleteById(courseId);
         } catch (Exception e) {
             throw new DatabaseDeletingException(e.getMessage());
         }
     }
 
     @Transactional
-    public void updateCourseById(UUID courseId, CourseDataDto courseData) {
-        CourseEntity courseEntity = courseRepository.findById(courseId).orElseThrow(() -> new ShareException.CourseNotFoundException(String.valueOf(courseId)));
+    public void updateById(UUID courseId, CourseDataDto courseData) {
+        CourseEntity courseEntity = repository.findById(courseId).orElseThrow(() -> new ShareException.CourseNotFoundException(String.valueOf(courseId)));
 
         courseEntity.setCourseName(courseData.getCourseName());
         courseEntity.setCourseAbbreviation(courseData.getCourseAbbreviation());
         try {
-            courseRepository.save(courseEntity);
+            repository.save(courseEntity);
         } catch (Exception e) {
             throw new DatabaseUpdatingException(e.getMessage());
         }

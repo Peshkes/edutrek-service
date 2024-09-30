@@ -21,30 +21,30 @@ public class StatusController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public List<StatusEntity> getAllStatuses() {
-        return statusService.getAllStatuses();
+        return statusService.getAll();
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public StatusEntity getStatusById(@PathVariable int id) {
-            return statusService.getStatusById(id);
+            return statusService.getById(id);
     }
 
     @PostMapping("")
     public ResponseEntity<String> addNewStatus(@RequestBody @Valid StatusDataDto statusData) {
-        statusService.addNewStatus(statusData);
+        statusService.addEntity(statusData);
         return new ResponseEntity<>("Status created", HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteStatusById(@PathVariable int id) {
-            statusService.deleteStatusById(id);
+            statusService.deleteById(id);
             return new ResponseEntity<>("Status deleted", HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<String> updateStatusById(@PathVariable int id, @RequestBody @Valid StatusDataDto statusData) {
-            statusService.updateStatusById(id, statusData.getStatusName());
+            statusService.updateById(id, statusData.getStatusName());
             return new ResponseEntity<>("Status updated", HttpStatus.OK);
     }
 

@@ -21,31 +21,31 @@ public class BranchController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public List<BranchEntity> getAllBranches() {
-        return branchService.getAllBranches();
+        return branchService.getAll();
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public BranchEntity getBranchById(@PathVariable int id) {
-        return branchService.getBranchById(id);
+        return branchService.getById(id);
     }
 
     @PostMapping("")
     public ResponseEntity<String> addNewBranch(@RequestBody @Valid BranchDataDto branchData) {
-        branchService.addNewBranch(branchData);
+        branchService.addEntity(branchData);
         return new ResponseEntity<>("Branch created", HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteBranchById(@PathVariable int id) {
-        branchService.deleteBranchById(id);
+        branchService.deleteById(id);
         return new ResponseEntity<>("Branch deleted", HttpStatus.OK);
     }
 
 
     @PutMapping("/{id}")
     public ResponseEntity<String> updateBranchById(@PathVariable int id, @RequestBody @Valid BranchDataDto branchData) {
-        branchService.updateBranchById(id, branchData);
+        branchService.updateById(id, branchData);
         return new ResponseEntity<>("Branch updated", HttpStatus.OK);
     }
 

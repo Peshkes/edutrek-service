@@ -22,7 +22,7 @@ public class CourseController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public List<CourseEntity> getAllCourses() {
-        return courseService.getAllCourses();
+        return courseService.getAll();
     }
 
     @GetMapping("/{id}")
@@ -33,19 +33,19 @@ public class CourseController {
 
     @PostMapping("")
     public ResponseEntity<String> addNewCourse(@RequestBody @Valid CourseDataDto courseData) {
-        courseService.addNewCourse(courseData);
+        courseService.addEntity(courseData);
         return new ResponseEntity<>("Course created", HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCourseById(@PathVariable @UUID String id) {
-        courseService.deleteCourseById(java.util.UUID.fromString(id));
+        courseService.deleteById(java.util.UUID.fromString(id));
         return new ResponseEntity<>("Course deleted", HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<String> updateBranchById(@PathVariable @UUID String id, @RequestBody @Valid CourseDataDto courseData) {
-        courseService.updateCourseById(java.util.UUID.fromString(id), courseData);
+        courseService.updateById(java.util.UUID.fromString(id), courseData);
         return new ResponseEntity<>("Course updated", HttpStatus.OK);
     }
 

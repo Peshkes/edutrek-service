@@ -28,7 +28,7 @@ VALUES ('Rehovot', 'Rehovot,Herzl st.1-25'),
 
 CREATE TABLE courses
 (
-    course_id           serial PRIMARY KEY,
+    course_id           uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     course_name         varchar(256) NOT NULL,
     course_abbreviation varchar(8)   NOT NULL
 );

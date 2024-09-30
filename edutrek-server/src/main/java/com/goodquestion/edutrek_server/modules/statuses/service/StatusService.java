@@ -21,42 +21,42 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StatusService {
 
-    private final StatusRepository statusRepository;
+    private final StatusRepository repository;
 
-    public List<StatusEntity> getAllStatuses() {
-        return statusRepository.findAll();
+    public List<StatusEntity> getAll() {
+        return repository.findAll();
     }
 
-    public StatusEntity getStatusById(int statusId) {
-        return statusRepository.findById(statusId).orElseThrow(() -> new StatusNotFoundException(statusId));
+    public StatusEntity getById(int statusId) {
+        return repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException(statusId));
     }
 
     @Transactional
-    public void addNewStatus(StatusDataDto statusData) {
+    public void addEntity(StatusDataDto statusData) {
         try {
-            statusRepository.save(new StatusEntity(statusData.getStatusName()));
+            repository.save(new StatusEntity(statusData.getStatusName()));
         } catch (Exception e) {
             throw new DatabaseAddingException(e.getMessage());
         }
     }
 
     @Transactional
-    public void deleteStatusById(int branchId) {
-        if (!statusRepository.existsById(branchId)) throw new BranchNotFoundException(String.valueOf(branchId));
+    public void deleteById(int branchId) {
+        if (!repository.existsById(branchId)) throw new BranchNotFoundException(String.valueOf(branchId));
 
         try {
-            statusRepository.deleteById(branchId);
+            repository.deleteById(branchId);
         } catch (Exception e) {
             throw new DatabaseDeletingException(e.getMessage());
         }
     }
 
     @Transactional
-    public void updateStatusById(int statusId, String newName) { //заменил на стринг
-        StatusEntity status = statusRepository.findById(statusId).orElseThrow(() -> new StatusNotFoundException(statusId));
+    public void updateById(int statusId, String newName) { //заменил на стринг
+        StatusEntity status = repository.findById(statusId).orElseThrow(() -> new StatusNotFoundException(statusId));
         status.setStatusName(newName);
         try {
-            statusRepository.save(status);
+            repository.save(status);
         } catch (Exception e) {
             throw new DatabaseUpdatingException(e.getMessage());
         }
