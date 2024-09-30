@@ -11,4 +11,10 @@ public class ShareException extends RuntimeException {
             super("Branch not found: " + message);
         }
     }
+
+    public static class CourseNotFoundException extends ShareException {
+        public CourseNotFoundException(String message) {
+            super("Course not found: " + message);
+        }
+    }
 }
