@@ -54,6 +54,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/branches").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.DELETE, "/branches/{id}").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.PUT, "/branches/{id}").hasRole(PRINCIPAL.toString())
+
+                        .requestMatchers(HttpMethod.GET, "/statuses", "/statuses/{statusId}").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/statuses").hasRole(PRINCIPAL.toString())
+                        .requestMatchers(HttpMethod.DELETE, "/statuses/{statusId}").hasRole(PRINCIPAL.toString())
+                        .requestMatchers(HttpMethod.PUT, "/statuses/{statusId}").hasRole(PRINCIPAL.toString())
                 .anyRequest().denyAll()
         );
 //        http.csrf(csrf -> csrfTokenRepository());

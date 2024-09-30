@@ -2,6 +2,8 @@ package com.goodquestion.edutrek_server.error;
 
 import java.util.UUID;
 
+
+
 public class AuthenticationException extends RuntimeException {
     public AuthenticationException(String message) {
         super(message);
@@ -48,4 +50,19 @@ public class AuthenticationException extends RuntimeException {
             super("Password already used. Please try again.");
         }
     }
+
+    public static class RoleExistsException extends AuthenticationException {
+
+    	public RoleExistsException(String role) {
+    		super("Role " + role + " already exists");
+    	}
+    }
+    
+    public static class RoleNotExistsException extends AuthenticationException {
+
+    	public RoleNotExistsException(String role) {
+    		super("Role " + role + " doest't exists");
+    	}
+    }
+
 }

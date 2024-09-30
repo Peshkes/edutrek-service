@@ -11,4 +11,10 @@ public class ShareException extends RuntimeException {
             super("Branch not found: " + message);
         }
     }
+
+    public static class StatusNotFoundException extends ShareException {
+        public StatusNotFoundException(int id) {
+            super("Status with id " + id +"was not found");
+        }
+    }
 }

@@ -26,13 +26,8 @@ public class BranchController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public BranchEntity getBranchById(@PathVariable String id) {
-        try {
-            int branchId = Integer.parseInt(id);
-            return branchService.getBranchById(branchId);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("ID must be a number");
-        }
+    public BranchEntity getBranchById(@PathVariable int id) {
+        return branchService.getBranchById(id);
     }
 
     @PostMapping("")
@@ -42,25 +37,16 @@ public class BranchController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteBranchById(@PathVariable String id) {
-        try {
-            int branchId = Integer.parseInt(id);
-            branchService.deleteBranchById(branchId);
-            return new ResponseEntity<>("Branch deleted", HttpStatus.OK);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("ID must be a number");
-        }
+    public ResponseEntity<String> deleteBranchById(@PathVariable int id) {
+        branchService.deleteBranchById(id);
+        return new ResponseEntity<>("Branch deleted", HttpStatus.OK);
     }
 
+
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateBranchById(@PathVariable String id, @RequestBody @Valid BranchDataDto branchData) {
-        try {
-            int branchId = Integer.parseInt(id);
-            branchService.updateBranchById(branchId, branchData);
-            return new ResponseEntity<>("Branch updated", HttpStatus.OK);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("ID must be a number");
-        }
+    public ResponseEntity<String> updateBranchById(@PathVariable int id, @RequestBody @Valid BranchDataDto branchData) {
+        branchService.updateBranchById(id, branchData);
+        return new ResponseEntity<>("Branch updated", HttpStatus.OK);
     }
 
 
