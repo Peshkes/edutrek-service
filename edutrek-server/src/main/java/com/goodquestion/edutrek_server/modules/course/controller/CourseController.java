@@ -44,7 +44,7 @@ public class CourseController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateBranchById(@PathVariable @UUID String id, @RequestBody @Valid CourseDataDto courseData) {
+    public ResponseEntity<String> updateCourseById(@PathVariable @UUID String id, @RequestBody @Valid CourseDataDto courseData) {
         courseService.updateById(java.util.UUID.fromString(id), courseData);
         return new ResponseEntity<>("Course updated", HttpStatus.OK);
     }
