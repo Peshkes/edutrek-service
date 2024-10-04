@@ -29,4 +29,10 @@ public class ShareException extends RuntimeException {
             super("Group not found: " + message);
         }
     }
+
+    public static class LecturerNotFoundException extends ShareException {
+        public LecturerNotFoundException(String message) {
+            super("Lecturer not found: " + message);
+        }
+    }
 }
