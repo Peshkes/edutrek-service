@@ -4,14 +4,12 @@ import com.goodquestion.edutrek_server.utility_service.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -22,51 +20,20 @@ import java.util.stream.Collectors;
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
     private JwtService jwtService;
-    private UserConfig userConfig;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String authHeader = request.getHeader("Authorization");
+        String accessToken = jwtService.getAccessToken(request);
         String username = null;
-        String jwt = null;
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            jwt = authHeader.substring(7);
+        if (accessToken != null) {
             try {
-                username = jwtService.getUsername(jwt);
+                username = jwtService.getUsername(accessToken);
             } catch (ExpiredJwtException e) {
-                String refreshToken = getRefreshToken(request);
-                if (refreshToken != null) {
-                    username = jwtService.getUsername(refreshToken);
-                    if (username != null) {
-                        UserDetails userDetails;
-                        String newAccessToken;
-                        try {
-                            userDetails = userConfig.loadUserByUsername(username);
-                            newAccessToken = jwtService.generateAccessToken(userDetails);
-                            if (!response.isCommitted()) {
-                                response.setHeader("Authorization", "Bearer " + newAccessToken);
-                            }
-                        } catch (Exception exception) {
-                            if (!response.isCommitted()) {
-                                logger.error("User not found with username: " + username);
-                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not found with username: " + username);
-                            }
-                            return;
-                        }
-                    }
-                } else {
-                    if (!response.isCommitted()) {
-                        logger.error("Access token has expired and refresh token is not available.");
-                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Access token has expired and refresh token is not available.");
-                    }
-                    return;
-                }
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Access token has expired.");
+                return;
             } catch (Exception e) {
-                if (!response.isCommitted()) {
-                    logger.error("Invalid token: " +  e.getMessage());
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token: " +  e.getMessage());
-                }
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token: " + e.getMessage());
                 return;
             }
         }
@@ -75,29 +42,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                     username,
                     null,
-                    jwtService.getRoles(jwt)
+                    jwtService.getRoles(accessToken)
                             .stream()
                             .map(SimpleGrantedAuthority::new)
                             .collect(Collectors.toList()));
             SecurityContextHolder.getContext().setAuthentication(token);
         }
 
-        if (!response.isCommitted()) {
-            filterChain.doFilter(request, response);
-        }
-    }
-
-    public String getRefreshToken(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("refreshToken".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-
-        return null;
+        filterChain.doFilter(request, response);
     }
 }

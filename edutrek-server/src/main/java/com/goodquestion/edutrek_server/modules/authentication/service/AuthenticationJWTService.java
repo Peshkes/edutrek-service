@@ -2,14 +2,13 @@ package com.goodquestion.edutrek_server.modules.authentication.service;
 
 import com.goodquestion.edutrek_server.config.SecurityConfig;
 import com.goodquestion.edutrek_server.config.UserConfig;
-import com.goodquestion.edutrek_server.error.AuthenticationException;
+import com.goodquestion.edutrek_server.error.AuthenticationException.*;
 import com.goodquestion.edutrek_server.modules.authentication.dto.AuthenticationDataDto;
 import com.goodquestion.edutrek_server.modules.authentication.dto.AuthenticationResultDto;
 import com.goodquestion.edutrek_server.modules.authentication.persistence.AccountRepository;
 import com.goodquestion.edutrek_server.utility_service.EmailService;
 import com.goodquestion.edutrek_server.utility_service.JwtService;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,8 +34,28 @@ public class AuthenticationJWTService extends AuthenticationAbstractService {
                 String refreshToken = jwtService.generateRefreshToken(userDetails);
                 return new AuthenticationResultDto(accessToken, refreshToken);
             } else
-                throw new AuthenticationException.WrongPasswordException();
+                throw new WrongPasswordException();
         } else
             throw new UsernameNotFoundException(username);
     }
+
+    public AuthenticationResultDto refreshToken(String refreshToken) {
+        if (refreshToken != null) {
+            String username = jwtService.getUsername(refreshToken);
+            UserDetails userDetails;
+            String accessToken;
+            try {
+                userDetails = userConfig.loadUserByUsername(username);
+                accessToken = jwtService.generateAccessToken(userDetails);
+                refreshToken = jwtService.generateRefreshToken(userDetails);
+                return new AuthenticationResultDto(accessToken, refreshToken);
+            } catch (Exception e) {
+                throw new UsernameNotFoundException(username);
+            }
+        } else {
+            throw new RefreshTokenNotFoundException();
+        }
+    }
+
+
 }

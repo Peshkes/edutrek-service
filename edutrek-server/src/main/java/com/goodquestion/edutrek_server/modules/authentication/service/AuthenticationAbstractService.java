@@ -2,12 +2,13 @@ package com.goodquestion.edutrek_server.modules.authentication.service;
 
 import com.goodquestion.edutrek_server.config.SecurityConfig;
 import com.goodquestion.edutrek_server.error.AuthenticationException;
-import com.goodquestion.edutrek_server.error.DatabaseException.*;
+import com.goodquestion.edutrek_server.error.DatabaseException.DatabaseAddingException;
+import com.goodquestion.edutrek_server.error.DatabaseException.DatabaseDeletingException;
+import com.goodquestion.edutrek_server.error.DatabaseException.DatabaseUpdatingException;
 import com.goodquestion.edutrek_server.modules.authentication.dto.*;
 import com.goodquestion.edutrek_server.modules.authentication.persistence.AccountDocument;
 import com.goodquestion.edutrek_server.modules.authentication.persistence.AccountRepository;
 import com.goodquestion.edutrek_server.utility_service.EmailService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;

@@ -65,4 +65,10 @@ public class AuthenticationException extends RuntimeException {
     	}
     }
 
+    public static class RefreshTokenNotFoundException extends AuthenticationException {
+        public RefreshTokenNotFoundException() {
+            super("Refresh token not found.");
+        }
+    }
+
 }

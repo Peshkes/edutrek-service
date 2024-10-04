@@ -42,11 +42,12 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((authorizeHttpRequests) ->
                 authorizeHttpRequests
-                        .requestMatchers(HttpMethod.GET,"/auth/csrf").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/auth").hasRole(PRINCIPAL.toString())
+                        .requestMatchers(HttpMethod.GET, "/auth/csrf").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/auth").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.GET, "/auth/id/{id}", "/auth/login/{login}").access(ownerOrPrincipalAuthorizationManager)
                         .requestMatchers(HttpMethod.POST, "/auth/account", "/auth/rollback").hasRole(PRINCIPAL.toString())
-                        .requestMatchers(HttpMethod.POST,"/auth").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/logout").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/auth", "/auth/refresh").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/auth/{id}").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.PUT, "/auth/login/{id}", "/auth/password/{id}").access(ownerAuthorizationManager)
 
@@ -64,7 +65,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/statuses").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.DELETE, "/statuses/{statusId}").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.PUT, "/statuses/{statusId}").hasRole(PRINCIPAL.toString())
-                .anyRequest().denyAll()
+                        .anyRequest().denyAll()
         );
 //        http.csrf(csrf -> csrfTokenRepository());
         http.csrf(AbstractHttpConfigurer::disable);
@@ -80,7 +81,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("*"));
 //        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://10.0.0.6:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
 //        configuration.setAllowCredentials(true);
         configuration.addAllowedHeader("*");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

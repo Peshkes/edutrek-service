@@ -2,6 +2,8 @@ package com.goodquestion.edutrek_server.utility_service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -73,6 +75,26 @@ public class JwtService {
 
     public List<String> getRoles(String token) {
         return getAllClaimsFromToken(token).get("roles", List.class);
+    }
+
+    public String getRefreshToken(HttpServletRequest request) {
+        return getTokenFromCookies("refreshToken", request);
+    }
+
+    public String getAccessToken(HttpServletRequest request) {
+        return getTokenFromCookies("accessToken", request);
+    }
+
+    private String getTokenFromCookies(String name, HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (name.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
     }
 
     private Claims getAllClaimsFromToken(String token) {

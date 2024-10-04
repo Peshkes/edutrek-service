@@ -3,6 +3,7 @@ package com.goodquestion.edutrek_server.modules.authentication.controller;
 import com.goodquestion.edutrek_server.modules.authentication.dto.*;
 import com.goodquestion.edutrek_server.modules.authentication.persistence.AccountDocument;
 import com.goodquestion.edutrek_server.modules.authentication.service.AuthenticationJWTService;
+import com.goodquestion.edutrek_server.utility_service.JwtService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthenticationController {
 
+    private final JwtService jwtService;
     private final AuthenticationJWTService authenticationService;
 //    private final AuthenticationBaseService authenticationService;
 
@@ -55,14 +57,33 @@ public class AuthenticationController {
     public ResponseEntity<String> signIn(@Valid @RequestBody AuthenticationDataDto authenticationDataDto, HttpServletResponse response) {
         AuthenticationResultDto result = authenticationService.signIn(authenticationDataDto);
 
-        Cookie refreshCookie = new Cookie("refreshToken", result.getRefreshToken());
-        refreshCookie.setHttpOnly(true);
-//        refreshCookie.setSecure(true);
-        refreshCookie.setPath("/");
+        response.addCookie(createCookie("accessToken", result.getAccessToken()));
+        response.addCookie(createCookie("refreshToken", result.getRefreshToken()));
 
-        response.addCookie(refreshCookie);
-        response.setHeader("Authorization", "Bearer " + result.getAccessToken());
         return ResponseEntity.ok("Sign-in successful");
+    }
+
+    @PostMapping("/refresh")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<String> refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = jwtService.getRefreshToken(request);
+
+        AuthenticationResultDto result = authenticationService.refreshToken(refreshToken);
+
+        response.addCookie(createCookie("accessToken", result.getAccessToken()));
+        response.addCookie(createCookie("refreshToken", result.getRefreshToken()));
+
+        return ResponseEntity.ok("Refresh successful");
+    }
+
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<String> logout(HttpServletResponse response) {
+
+        response.addCookie(createCookie("accessToken", null));
+        response.addCookie(createCookie("refreshToken", null));
+
+        return ResponseEntity.ok("Logout successful");
     }
 
     @PostMapping("/account")
@@ -93,5 +114,15 @@ public class AuthenticationController {
     @ResponseStatus(HttpStatus.OK)
     public AccountDocument deleteAccount(@PathVariable @UUID String id) {
         return authenticationService.deleteAccount(java.util.UUID.fromString(id));
+    }
+
+    //UTILS
+
+    private Cookie createCookie(String name, String value) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+//    cookie.setSecure(true);
+        return cookie;
     }
 }

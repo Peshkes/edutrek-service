@@ -1,6 +1,7 @@
 package com.goodquestion.edutrek_server.error;
 
 import com.goodquestion.edutrek_server.error.AuthenticationException.*;
+import com.goodquestion.edutrek_server.error.ShareException.*;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSourceResolvable;
@@ -19,6 +20,26 @@ import java.util.stream.Collectors;
 @Slf4j
 @ControllerAdvice
 public class ErrorController  {
+
+    @ExceptionHandler(RefreshTokenNotFoundException.class)
+    ResponseEntity<String> refreshTokenNotFoundExceptionHandler(RefreshTokenNotFoundException e) {
+        return returnResponse(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(BranchNotFoundException.class)
+    ResponseEntity<String> branchNotFoundExceptionHandler(BranchNotFoundException e) {
+        return returnResponse(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(GroupNotFoundException.class)
+    ResponseEntity<String> groupNotFoundExceptionHandler(GroupNotFoundException e) {
+        return returnResponse(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CourseNotFoundException.class)
+    ResponseEntity<String> courseNotFoundExceptionHandler(CourseNotFoundException e) {
+        return returnResponse(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
 
     @ExceptionHandler(PasswordAlreadyUsedException.class)
     ResponseEntity<String> passwordAlreadyUsedExceptionHandler(PasswordAlreadyUsedException e) {

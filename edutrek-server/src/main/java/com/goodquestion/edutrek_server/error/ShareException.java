@@ -14,13 +14,19 @@ public class ShareException extends RuntimeException {
 
     public static class StatusNotFoundException extends ShareException {
         public StatusNotFoundException(int id) {
-            super("Status with id " + id +"was not found");
+            super("Status with id " + id + "was not found");
         }
     }
 
     public static class CourseNotFoundException extends ShareException {
         public CourseNotFoundException(String message) {
             super("Course not found: " + message);
+        }
+    }
+
+    public static class GroupNotFoundException extends ShareException {
+        public GroupNotFoundException(String message) {
+            super("Group not found: " + message);
         }
     }
 }
