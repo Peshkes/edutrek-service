@@ -12,7 +12,6 @@ import com.goodquestion.edutrek_server.modules.contacts.dto.ContactsDataDto;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.ContactsEntity;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.ContactsRepository;
 import com.goodquestion.edutrek_server.modules.statuses.persistence.StatusEntity;
-import com.goodquestion.edutrek_server.modules.statuses.persistence.StatusRepository;
 import com.goodquestion.edutrek_server.modules.statuses.service.StatusService;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -39,7 +38,7 @@ public class ContactsService {
     private final ContactsRepository repository;
     private final ContactsArchiveRepository archiveRepository;
     private final StatusService statusService;
-    private final StatusRepository statusRepository;
+
 
     public Page<ContactsEntity> getAll(String search, int statusId, int page, int pageSize) {
         String status;
