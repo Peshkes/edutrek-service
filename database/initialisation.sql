@@ -1,4 +1,5 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE
+EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE statuses
 (
@@ -9,7 +10,7 @@ CREATE TABLE statuses
 INSERT INTO statuses (status_name)
 VALUES ('Lead'),
        ('In work'),
-       ('Consultaion'),
+       ('Consultation'),
        ('Save for later'),
        ('Student'),
        ('Archive');
@@ -42,13 +43,13 @@ CREATE TABLE contacts
 (
     contact_id       uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     contact_name     varchar(256) NOT NULL,
-    phone            int          NOT NULL,
+    phone            varchar(15)  NOT NULL,
     email            varchar(256) NOT NULL,
     status_id        int          NOT NULL,
     FOREIGN KEY (status_id) REFERENCES statuses (status_id),
     branch_id        int          NOT NULL,
     FOREIGN KEY (branch_id) REFERENCES branches (branch_id),
-    target_course_id uuid          NOT NULL,
+    target_course_id uuid         NOT NULL,
     FOREIGN KEY (target_course_id) REFERENCES courses (course_id),
     comment          varchar(256)
 );
@@ -91,8 +92,8 @@ CREATE TABLE groups
     group_name       varchar(25)  NOT NULL,
     start_date       date         NOT NULL,
     finish_date      date         NOT NULL,
-    isActive         boolean      NOT NULL,
-    course_id        uuid          NOT NULL,
+    is_active        boolean      NOT NULL,
+    course_id        uuid         NOT NULL,
     FOREIGN KEY (course_id) REFERENCES courses (course_id),
     slack_link       varchar(256) NOT NULL,
     whats_app_link   varchar(256) NOT NULL,
@@ -106,14 +107,15 @@ CREATE TABLE students_by_group
     FOREIGN KEY (contact_id) REFERENCES students_information (contact_id),
     group_id   uuid NOT NULL,
     FOREIGN KEY (group_id) REFERENCES groups (group_id),
-    PRIMARY KEY (contact_id, group_id)
+    PRIMARY KEY (contact_id, group_id),
+    is_active boolean NOT NULL
 );
 
 CREATE TABLE lecturers
 (
     lecturer_id   uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     lecturer_name varchar(256) NOT NULL,
-    phone         int          NOT NULL,
+    phone         varchar(15)  NOT NULL,
     email         varchar(256) NOT NULL,
     branch_id     int          NOT NULL,
     FOREIGN KEY (branch_id) REFERENCES branches (branch_id),
@@ -126,7 +128,8 @@ CREATE TABLE lecturers_by_group
     FOREIGN KEY (lecturer_id) REFERENCES lecturers (lecturer_id),
     group_id    uuid NOT NULL,
     FOREIGN KEY (group_id) REFERENCES groups (group_id),
-    PRIMARY KEY (lecturer_id, group_id)
+    PRIMARY KEY (lecturer_id, group_id),
+    is_webinarist boolean NOT NULL
 );
 
 CREATE TABLE weekdays

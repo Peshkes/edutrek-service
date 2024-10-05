@@ -24,7 +24,7 @@ public class CourseService {
         return repository.findAll();
     }
 
-    public CourseEntity getCourseById(UUID courseId) {
+    public CourseEntity getById(UUID courseId) {
         return repository.findById(courseId).orElseThrow(() -> new ShareException.CourseNotFoundException(String.valueOf(courseId)));
     }
 

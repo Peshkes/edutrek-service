@@ -30,6 +30,19 @@ public class ShareException extends RuntimeException {
         }
     }
 
+    public static class ContactNotFoundException extends ShareException {
+        public ContactNotFoundException(String message) {
+            super("Course not found: " + message);
+        }
+    }
+
+    public static class ContactAlreadyExistsException extends ShareException {
+        public ContactAlreadyExistsException(String phone, String email) {
+            super("Course not found: " + (email == null ? phone : email));
+        }
+    }
+
+
     public static class LecturerNotFoundException extends ShareException {
         public LecturerNotFoundException(String message) {
             super("Lecturer not found: " + message);
