@@ -1,4 +1,4 @@
-package com.goodquestion.edutrek_server.modules.group.persistence;
+package com.goodquestion.edutrek_server.modules.group.key;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,6 +11,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ComposeLecturerKey implements Serializable {
-    private UUID lecturerId;
     private UUID groupId;
+    private UUID lecturerId;
 }

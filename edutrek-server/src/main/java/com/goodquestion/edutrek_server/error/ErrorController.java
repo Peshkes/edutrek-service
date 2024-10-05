@@ -20,6 +20,15 @@ import java.util.stream.Collectors;
 @Slf4j
 @ControllerAdvice
 public class ErrorController  {
+    @ExceptionHandler(StudentAlreadyInThisGroupException.class)
+    ResponseEntity<String> studentAlreadyInThisGroupExceptionHandler(StudentAlreadyInThisGroupException e) {
+        return returnResponse(e.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(StudentNotFoundInThisGroupException.class)
+    ResponseEntity<String> studentNotFoundInThisGroupExceptionHandler(StudentNotFoundInThisGroupException e) {
+        return returnResponse(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
 
     @ExceptionHandler(LecturerNotFoundException.class)
     ResponseEntity<String> lecturerNotFoundExceptionHandler(LecturerNotFoundException e) {

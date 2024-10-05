@@ -35,4 +35,16 @@ public class ShareException extends RuntimeException {
             super("Lecturer not found: " + message);
         }
     }
+
+    public static class StudentNotFoundInThisGroupException extends ShareException {
+        public StudentNotFoundInThisGroupException(String groupId, String studentId) {
+            super("Student with id " + studentId + " was not found in group with id " + groupId);
+        }
+    }
+
+    public static class StudentAlreadyInThisGroupException extends ShareException {
+        public StudentAlreadyInThisGroupException(String groupId, String studentId) {
+            super("Student with id " + studentId + " was already in group with id " + groupId);
+        }
+    }
 }

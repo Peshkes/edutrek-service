@@ -4,14 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.UUID;
+
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PaginationResponse {
-    private List<GroupDto> groups;
-    private long total;
-    private int page;
-    private int size;
+public class ChangeLecturersDto {
+    private UUID lecturerId;
+    private boolean isWebinarist;
+
+    public boolean getIsWebinarist() {
+        return isWebinarist;
+    }
 }

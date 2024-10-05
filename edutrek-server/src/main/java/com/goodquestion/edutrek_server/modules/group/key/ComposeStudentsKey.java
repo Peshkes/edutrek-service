@@ -1,4 +1,4 @@
-package com.goodquestion.edutrek_server.modules.group.persistence;
+package com.goodquestion.edutrek_server.modules.group.key;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +10,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ComposeWeekdayKey implements Serializable {
+public class ComposeStudentsKey implements Serializable {
     private UUID groupId;
-    private int weekdayId;
+    private UUID studentId;
 }
