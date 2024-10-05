@@ -23,6 +23,11 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class ErrorController {
 
+    @ExceptionHandler(LecturerNotFoundException.class)
+    ResponseEntity<String> lecturerNotFoundExceptionHandler(LecturerNotFoundException e) {
+        return returnResponse(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(RefreshTokenNotFoundException.class)
     ResponseEntity<String> refreshTokenNotFoundExceptionHandler(RefreshTokenNotFoundException e) {
         return returnResponse(e.getMessage(), HttpStatus.NOT_FOUND);

@@ -42,4 +42,10 @@ public class ShareException extends RuntimeException {
         }
     }
 
+
+    public static class LecturerNotFoundException extends ShareException {
+        public LecturerNotFoundException(String message) {
+            super("Lecturer not found: " + message);
+        }
+    }
 }
