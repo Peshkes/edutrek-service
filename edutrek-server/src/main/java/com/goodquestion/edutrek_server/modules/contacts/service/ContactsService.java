@@ -44,11 +44,12 @@ public class ContactsService {
     public Page<ContactsEntity> getAll(String search, int statusId, int page, int pageSize) {
         String status;
         Pageable pageable;
-        if (statusId > 0) {
+        if (statusId >= 0) {
             status = statusService.getById(statusId).getStatusName();
             pageable = PageRequest.of(page, pageSize, Sort.by(status));
         } else
             pageable = PageRequest.of(page, pageSize);
+
         if(!search.isBlank() && !search.isEmpty()){
             Specification<ContactsEntity> specs = new Specification<ContactsEntity>() {
                 @Override

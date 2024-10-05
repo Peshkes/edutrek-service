@@ -30,7 +30,7 @@ public class ContactsController {
             @RequestParam(defaultValue = "0") int statusId,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize) {
-        return contactsService.getAll(search, statusId, page, pageSize);
+        return contactsService.getAll(search,statusId,page,pageSize);
     }
 
     @GetMapping("/{id}")
