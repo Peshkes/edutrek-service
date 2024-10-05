@@ -28,7 +28,7 @@ public class CourseController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public CourseEntity getCourseById(@PathVariable @UUID String id) {
-        return courseService.getCourseById(java.util.UUID.fromString(id));
+        return courseService.getById(java.util.UUID.fromString(id));
     }
 
     @PostMapping("")

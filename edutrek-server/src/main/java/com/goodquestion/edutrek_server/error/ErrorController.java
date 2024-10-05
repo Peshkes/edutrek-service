@@ -1,7 +1,9 @@
 package com.goodquestion.edutrek_server.error;
 
 import com.goodquestion.edutrek_server.error.AuthenticationException.*;
-import com.goodquestion.edutrek_server.error.ShareException.*;
+
+import static com.goodquestion.edutrek_server.error.ShareException.*;
+
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSourceResolvable;
@@ -19,7 +21,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @ControllerAdvice
-public class ErrorController  {
+public class ErrorController {
 
     @ExceptionHandler(RefreshTokenNotFoundException.class)
     ResponseEntity<String> refreshTokenNotFoundExceptionHandler(RefreshTokenNotFoundException e) {
@@ -45,15 +47,15 @@ public class ErrorController  {
     ResponseEntity<String> passwordAlreadyUsedExceptionHandler(PasswordAlreadyUsedException e) {
         return returnResponse(e.getMessage(), HttpStatus.CONFLICT);
     }
-    
+
     @ExceptionHandler(RoleExistsException.class)
     ResponseEntity<String> passwordAlreadyUsedExceptionHandler(RoleExistsException e) {
-    	return returnResponse(e.getMessage(), HttpStatus.CONFLICT);
+        return returnResponse(e.getMessage(), HttpStatus.CONFLICT);
     }
-    
+
     @ExceptionHandler(RoleNotExistsException.class)
     ResponseEntity<String> passwordAlreadyUsedExceptionHandler(RoleNotExistsException e) {
-    	return returnResponse(e.getMessage(), HttpStatus.CONFLICT);
+        return returnResponse(e.getMessage(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(LoginAlreadyExistsException.class)
@@ -119,6 +121,7 @@ public class ErrorController  {
     ResponseEntity<String> httpMessageNotReadableExceptionHandler() {
         return returnResponse("Error reading JSON. Please check the data format.", HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(IllegalArgumentException.class)
     ResponseEntity<String> illegalArgumentException(IllegalArgumentException e) {
         return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -129,9 +132,35 @@ public class ErrorController  {
         return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(StatusNotFoundException.class)
+    ResponseEntity<String> statusNotFoundException(StatusNotFoundException e) {
+        return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BranchNotFoundException.class)
+    ResponseEntity<String> branchNotFoundException(BranchNotFoundException e) {
+        return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CourseNotFoundException.class)
+    ResponseEntity<String> courseNotFoundException(CourseNotFoundException e) {
+        return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
     private ResponseEntity<String> returnResponse(String message, HttpStatus status) {
         log.error(message);
         return new ResponseEntity<>(message, status);
     }
+
+    @ExceptionHandler(ContactNotFoundException.class)
+    ResponseEntity<String> contactNotFoundException(ContactNotFoundException e) {
+        return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ContactAlreadyExistsException.class)
+    ResponseEntity<String> contactAlreadyExistsException(ContactAlreadyExistsException e) {
+        return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
 
 }
