@@ -1,6 +1,6 @@
 package com.goodquestion.edutrek_server.modules.contacts.persistence;
 
-import com.goodquestion.edutrek_server.modules.branch.persistence.BranchRepository;
+
 import org.springframework.data.jpa.domain.Specification;
 
 public class ContactsFilterSpecifications {
