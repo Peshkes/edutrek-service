@@ -1,4 +1,4 @@
-package com.goodquestion.edutrek_server.modules.group.persistence;
+package com.goodquestion.edutrek_server.modules.group.junction_persistence;
 
 import com.goodquestion.edutrek_server.modules.group.key.ComposeStudentsKey;
 import org.springframework.data.jpa.repository.JpaRepository;

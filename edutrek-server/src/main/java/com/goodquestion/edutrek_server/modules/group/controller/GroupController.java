@@ -80,7 +80,7 @@ public class GroupController {
 
     @PutMapping("/archive/students/{id}")
     public ResponseEntity<String> archiveStudents(@PathVariable @UUID String id, @RequestBody @Valid List<java.util.UUID> students) {
-        groupService.archiveStudents(id, students);
+        groupService.archiveStudents(java.util.UUID.fromString(id), students);
         return new ResponseEntity<>("Students archived", HttpStatus.CREATED);
     }
 

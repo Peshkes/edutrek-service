@@ -1,6 +1,5 @@
 package com.goodquestion.edutrek_server.modules.group.persistence;
 
-import com.goodquestion.edutrek_server.modules.course.persistence.CourseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +14,7 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GroupEntity {
+public class GroupEntity implements IGroup{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "group_id")
@@ -32,9 +31,8 @@ public class GroupEntity {
     @Column(name = "is_active")
     private Boolean isActive;
     @Setter
-    @ManyToOne
-    @JoinColumn(name = "course_id", referencedColumnName = "course_id")
-    private CourseEntity course;
+    @Column(name = "course_id")
+    private UUID courseId;
     @Setter
     @Column(name = "slack_link")
     private String slackLink;
@@ -48,12 +46,12 @@ public class GroupEntity {
     @Column(name = "deactivate_after")
     private Boolean deactivateAfter;
 
-    public GroupEntity(String groupName, LocalDate startDate, LocalDate finishDate, Boolean isActive,  CourseEntity course, String slackLink, String whatsAppLink, String skypeLink, Boolean deactivateAfter) {
+    public GroupEntity(String groupName, LocalDate startDate, LocalDate finishDate, Boolean isActive, UUID courseId, String slackLink, String whatsAppLink, String skypeLink, Boolean deactivateAfter) {
         this.groupName = groupName;
         this.startDate = startDate;
         this.finishDate = finishDate;
         this.isActive = isActive;
-        this.course = course;
+        this.courseId = courseId;
         this.slackLink = slackLink;
         this.whatsAppLink = whatsAppLink;
         this.skypeLink = skypeLink;

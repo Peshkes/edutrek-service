@@ -19,4 +19,6 @@ public class UpdateGroupDto {
     private String whatsAppLink;
     private String skypeLink;
     private Boolean deactivateAfter;
+    private int[] lessons;
+    private int[] webinars;
 }

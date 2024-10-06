@@ -1,10 +1,14 @@
-package com.goodquestion.edutrek_server.modules.group.persistence;
+package com.goodquestion.edutrek_server.modules.group.junction_persistence;
 
 import com.goodquestion.edutrek_server.modules.group.key.ComposeWeekdayKey;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "lessons_by_weekday")
 @IdClass(ComposeWeekdayKey.class)
