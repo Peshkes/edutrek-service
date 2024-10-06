@@ -1,7 +1,6 @@
 package com.goodquestion.edutrek_server.modules.contacts.controller;
 
 
-
 import com.goodquestion.edutrek_server.modules.contacts.dto.ContactSearchDto;
 import com.goodquestion.edutrek_server.modules.contacts.dto.ContactsDataDto;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.ContactsEntity;
@@ -27,11 +26,12 @@ public class ContactsController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public ContactSearchDto getAll(
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) Integer statusId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int pageSize) {
-        return contactsService.getAll(search,statusId,page,pageSize);
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Integer statusId
+    ) {
+        return contactsService.getAll(page, pageSize, search, statusId);
     }
 
     @GetMapping("/{id}")

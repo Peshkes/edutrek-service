@@ -37,7 +37,7 @@ public class ContactsService {
     private final StatusService statusService;
 
 
-    public ContactSearchDto getAll(String search, Integer statusId, int page, int pageSize) {
+    public ContactSearchDto getAll(int page, int pageSize, String search, Integer statusId) {
         Pageable pageable = PageRequest.of(page, pageSize);
         Specification<ContactsEntity> specs = Specification.where(null);
         if (statusId != null)
