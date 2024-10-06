@@ -6,7 +6,4 @@ import com.goodquestion.edutrek_server.modules.contacts.persistence.ContactsEnti
 
 import java.util.List;
 
-public class ContactSearchDto {
-        List<ContactsEntity> contacts;
-
-}
+public record ContactSearchDto(List<ContactsEntity> contacts, int page, int pageSIze, long totalItems) {}

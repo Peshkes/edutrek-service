@@ -8,8 +8,10 @@ import static com.goodquestion.edutrek_server.error.ShareException.*;
 
 import com.goodquestion.edutrek_server.modules.ContactsArchive.persistence.ContactArchiveEntity;
 import com.goodquestion.edutrek_server.modules.ContactsArchive.persistence.ContactsArchiveRepository;
+import com.goodquestion.edutrek_server.modules.contacts.dto.ContactSearchDto;
 import com.goodquestion.edutrek_server.modules.contacts.dto.ContactsDataDto;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.ContactsEntity;
+import com.goodquestion.edutrek_server.modules.contacts.persistence.ContactsFilterSpecifications;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.ContactsRepository;
 import com.goodquestion.edutrek_server.modules.statuses.persistence.StatusEntity;
 import com.goodquestion.edutrek_server.modules.statuses.service.StatusService;
@@ -40,25 +42,19 @@ public class ContactsService {
     private final StatusService statusService;
 
 
-    public Page<ContactsEntity> getAll(String search, int statusId, int page, int pageSize) {
+    public ContactSearchDto getAll(String search, Integer statusId, int page, int pageSize) {
         String status;
-        Pageable pageable;
-        if (statusId >= 0) {
-            status = statusService.getById(statusId).getStatusName();
-            pageable = PageRequest.of(page, pageSize, Sort.by(status));
-        } else
-            pageable = PageRequest.of(page, pageSize);
-
-        if(!search.isBlank() && !search.isEmpty()){
-            Specification<ContactsEntity> specs = new Specification<ContactsEntity>() {
-                @Override
-                public Predicate toPredicate(Root<ContactsEntity> r, CriteriaQuery<?> q, CriteriaBuilder cb) {
-                    return cb.like(r.get("contact_name"), "%" + search + "%");
-                }
-            };
-            return repository.findAll(specs,pageable);
+        Pageable pageable = PageRequest.of(page, pageSize);
+        Specification<ContactsEntity> specs = Specification.where(null);
+        if (statusId != null)
+            specs = specs.and(ContactsFilterSpecifications.hasStatusId(statusId));
+        if (search != null && !search.isEmpty() && !search.isBlank()) {
+            specs = specs.and(ContactsFilterSpecifications.hasName(search))
+                    .or(ContactsFilterSpecifications.hasPhone(search))
+                    .or(ContactsFilterSpecifications.hasEmail(search));
         }
-        return repository.findAll(pageable);
+        Page<ContactsEntity> pageEntity = repository.findAll(specs.and(specs), pageable);
+        return new ContactSearchDto(pageEntity.getContent(), page, pageSize, pageEntity.getTotalElements());
     }
 
     public ContactsEntity getById(UUID id) {
@@ -109,7 +105,7 @@ public class ContactsService {
         List<Integer> archive = statusService.getAll().stream().filter(s -> s.getStatusName().equalsIgnoreCase("Archive")).map(StatusEntity::getStatusId).toList();
         contact.setStatusId(archive.getFirst());
         try {
-            String reason = "Finished course and graduated";//TODO maybe ad as a variable
+            String reason = "Finished course and graduated";
             archiveRepository.save(new ContactArchiveEntity(id, contact.getContactName(), contact.getPhone(), contact.getEmail(), contact.getStatusId(), contact.getBranchId(), contact.getTargetCourseId(), reason, LocalDate.now()));
             repository.deleteById(id);
         } catch (Exception e) {

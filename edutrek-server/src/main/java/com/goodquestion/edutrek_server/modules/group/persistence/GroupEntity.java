@@ -29,14 +29,14 @@ public class GroupEntity {
     @Column(name = "finish_date")
     private LocalDate finishDate;
     @Setter
-    @Column(name = "isactive")
+    @Column(name = "is_active")
     private Boolean isActive;
     @Setter
     @ManyToOne
     @JoinColumn(name = "course_id", referencedColumnName = "course_id")
     private CourseEntity course;
     @Setter
-    @Column(name = "isactive")
+    @Column(name = "slack_link")
     private String slackLink;
     @Setter
     @Column(name = "whats_app_link")

@@ -2,13 +2,14 @@ package com.goodquestion.edutrek_server.modules.contacts.controller;
 
 
 
+import com.goodquestion.edutrek_server.modules.contacts.dto.ContactSearchDto;
 import com.goodquestion.edutrek_server.modules.contacts.dto.ContactsDataDto;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.ContactsEntity;
 import com.goodquestion.edutrek_server.modules.contacts.service.ContactsService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.data.domain.Page;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,10 +26,10 @@ public class ContactsController {
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public Page<ContactsEntity> getAll(
-            @RequestParam(defaultValue = "") String search,
-            @RequestParam(defaultValue = "0") int statusId,
-            @RequestParam(defaultValue = "1") int page,
+    public ContactSearchDto getAll(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Integer statusId,
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int pageSize) {
         return contactsService.getAll(search,statusId,page,pageSize);
     }

@@ -16,7 +16,7 @@ public record ContactArchiveEntity(
         int statusId,
         int branchId,
         int courseId,
-        String whyArchived,
+        String reasonOfArchivation,
         LocalDate archivationDate
 ) {
 
