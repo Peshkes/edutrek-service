@@ -1,12 +1,10 @@
 package com.goodquestion.edutrek_server.modules.contacts.persistence;
 
-import com.goodquestion.edutrek_server.modules.branch.persistence.BranchEntity;
 import com.goodquestion.edutrek_server.modules.branch.persistence.BranchRepository;
 import org.springframework.data.jpa.domain.Specification;
 
 public class ContactsFilterSpecifications {
 
-    private static BranchRepository branchRepository;
 
     public static Specification<ContactsEntity> hasName(String name) {
         return (r, q, cb) -> cb.like(r.get("contact_name"), "%" + name + "%");

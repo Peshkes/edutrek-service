@@ -15,15 +15,10 @@ import com.goodquestion.edutrek_server.modules.contacts.persistence.ContactsFilt
 import com.goodquestion.edutrek_server.modules.contacts.persistence.ContactsRepository;
 import com.goodquestion.edutrek_server.modules.statuses.persistence.StatusEntity;
 import com.goodquestion.edutrek_server.modules.statuses.service.StatusService;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +38,6 @@ public class ContactsService {
 
 
     public ContactSearchDto getAll(String search, Integer statusId, int page, int pageSize) {
-        String status;
         Pageable pageable = PageRequest.of(page, pageSize);
         Specification<ContactsEntity> specs = Specification.where(null);
         if (statusId != null)
