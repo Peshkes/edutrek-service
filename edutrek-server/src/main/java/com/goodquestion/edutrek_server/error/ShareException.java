@@ -60,4 +60,10 @@ public class ShareException extends RuntimeException {
             super("Student with id " + studentId + " was already in group with id " + groupId);
         }
     }
+
+    public static class LogNotFoundException extends ShareException {
+        public LogNotFoundException(String message) {
+            super("Log not found: " + message);
+        }
+    }
 }

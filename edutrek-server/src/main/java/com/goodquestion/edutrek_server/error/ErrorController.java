@@ -22,6 +22,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @ControllerAdvice
 public class ErrorController  {
+
+    @ExceptionHandler(LogNotFoundException.class)
+    ResponseEntity<String> logNotFoundExceptionHandler(LogNotFoundException e) {
+        return returnResponse(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(StudentAlreadyInThisGroupException.class)
     ResponseEntity<String> studentAlreadyInThisGroupExceptionHandler(StudentAlreadyInThisGroupException e) {
         return returnResponse(e.getMessage(), HttpStatus.CONFLICT);

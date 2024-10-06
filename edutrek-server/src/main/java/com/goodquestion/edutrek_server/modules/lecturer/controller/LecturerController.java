@@ -21,30 +21,30 @@ public class LecturerController {
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public List<LecturerEntity> getAllStatuses() {
+    public List<LecturerEntity> getAllLecturers() {
         return service.getAll();
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public LecturerEntity getStatusById(@PathVariable @UUID String id) {
+    public LecturerEntity getLecturerById(@PathVariable @UUID String id) {
             return service.getById(java.util.UUID.fromString(id));
     }
 
     @PostMapping("")
-    public ResponseEntity<String> addNewStatus(@RequestBody @Valid LecturerDataDto data) {
+    public ResponseEntity<String> addNewLecturer(@RequestBody @Valid LecturerDataDto data) {
         service.addEntity(data);
         return new ResponseEntity<>("Lecturer created", HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteStatusById(@PathVariable @UUID String id) {
+    public ResponseEntity<String> deleteLecturerById(@PathVariable @UUID String id) {
             service.deleteById(java.util.UUID.fromString(id));
             return new ResponseEntity<>("Lecturer deleted", HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateStatusById(@PathVariable @UUID String id, @RequestBody @Valid LecturerDataDto data) {
+    public ResponseEntity<String> updateLecturerById(@PathVariable @UUID String id, @RequestBody @Valid LecturerDataDto data) {
             service.updateById(java.util.UUID.fromString(id), data);
             return new ResponseEntity<>("Lecturer updated", HttpStatus.OK);
     }
