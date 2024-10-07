@@ -1,4 +1,4 @@
-package com.goodquestion.edutrek_server.modules.ContactsArchive.persistence;
+package com.goodquestion.edutrek_server.modules.contacts.archive;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -7,7 +7,7 @@ import java.util.UUID;
 
 
 @Document("contacts_archive")
-public record ContactArchiveEntity(
+public record ContactArchiveDocument(
         @Id
         UUID contactId,
         String contactName,
@@ -15,7 +15,7 @@ public record ContactArchiveEntity(
         String email,
         int statusId,
         int branchId,
-        int courseId,
+        UUID courseId,
         String reasonOfArchivation,
         LocalDate archivationDate
 ) {

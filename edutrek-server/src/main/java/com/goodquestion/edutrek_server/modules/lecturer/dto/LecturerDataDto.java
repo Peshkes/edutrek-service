@@ -7,8 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Getter
 @Setter
 @Data
@@ -30,7 +28,7 @@ public class LecturerDataDto {
     private String email;
 
     @NotNull(message = "Branch ID cannot be null")
-    private UUID branchId;
+    private int branchId;
 
     @Size(max = 255, message = "Comment must be less than 255 characters")
     private String comment;

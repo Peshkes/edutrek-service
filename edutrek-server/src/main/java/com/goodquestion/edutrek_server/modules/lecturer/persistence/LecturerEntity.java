@@ -27,12 +27,12 @@ public class LecturerEntity {
     private String email;
     @Setter
     @Column(name = "branch_id")
-    private UUID branchId;
+    private int branchId;
     @Setter
     @Column(name = "comment")
     private String comment;
 
-    public LecturerEntity(String lecturerName, String phone, String email, UUID branchId, String comment) {
+    public LecturerEntity(String lecturerName, String phone, String email, int branchId, String comment) {
         this.lecturerName = lecturerName;
         this.phone = phone;
         this.email = email;

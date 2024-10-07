@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,9 +60,9 @@ public class ContactsController {
         return new ResponseEntity<>("Contact updated", HttpStatus.OK);
     }
 
-    @PutMapping("/graduate/{id}")
-    public ResponseEntity<String> graduateById(@PathVariable UUID id) {
-        contactsService.graduateById(id);
+    @PutMapping("/graduate/{id}/{reason}")
+    public ResponseEntity<String> moveToArchiveById(@PathVariable UUID id,@PathVariable @DefaultValue("") String reason) {
+        contactsService.moveToArchiveById(id,reason);
         return new ResponseEntity<>("Contact moved to archive", HttpStatus.OK);
     }
 

@@ -48,11 +48,6 @@ public class ErrorController  {
         return returnResponse(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(BranchNotFoundException.class)
-    ResponseEntity<String> branchNotFoundExceptionHandler(BranchNotFoundException e) {
-        return returnResponse(e.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
     @ExceptionHandler(GroupNotFoundException.class)
     ResponseEntity<String> groupNotFoundExceptionHandler(GroupNotFoundException e) {
         return returnResponse(e.getMessage(), HttpStatus.NOT_FOUND);
@@ -162,16 +157,6 @@ public class ErrorController  {
         return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(CourseNotFoundException.class)
-    ResponseEntity<String> courseNotFoundException(CourseNotFoundException e) {
-        return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    private ResponseEntity<String> returnResponse(String message, HttpStatus status) {
-        log.error(message);
-        return new ResponseEntity<>(message, status);
-    }
-
     @ExceptionHandler(ContactNotFoundException.class)
     ResponseEntity<String> contactNotFoundException(ContactNotFoundException e) {
         return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -182,5 +167,18 @@ public class ErrorController  {
         return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(StudentNotFoundException.class)
+    ResponseEntity<String> studentNotFoundException(StudentNotFoundException e) {
+        return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 
+    @ExceptionHandler(StudentAlreadyExistsException.class)
+    ResponseEntity<String> studentAlreadyExistsException(StudentAlreadyExistsException e) {
+        return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    private ResponseEntity<String> returnResponse(String message, HttpStatus status) {
+        log.error(message);
+        return new ResponseEntity<>(message, status);
+    }
 }

@@ -56,6 +56,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/branches/{id}").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.PUT, "/branches/{id}").hasRole(PRINCIPAL.toString())
 
+                        .requestMatchers(HttpMethod.GET, "/contacts", "/contacts/{id}").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/contacts").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/contacts/{id}").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/contacts/{id}", "/contacts/graduate/{id}/{reason}").authenticated()
+
                         .requestMatchers(HttpMethod.GET, "/courses", "/courses/{id}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/courses").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.DELETE, "/courses/{id}").hasRole(PRINCIPAL.toString())
@@ -79,6 +84,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/statuses").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.DELETE, "/statuses/{id}").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.PUT, "/statuses/{id}").hasRole(PRINCIPAL.toString())
+
+                        .requestMatchers(HttpMethod.GET, "/students", "/students/{id}").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/students").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/students/{id}").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/students/{id}", "/students/archive/{id}/{reason}","/students/graduate/{id}").authenticated()
 
                         .requestMatchers(HttpMethod.GET, "/weekdays", "/weekdays/{id}").authenticated()
 

@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
+import java.util.UUID;
 
 
 @Data
@@ -26,12 +26,14 @@ public class ContactsDataDto {
     @Pattern(regexp = "(.[^,\\s]+@(\\w[^_#]+\\.)+[a-z]{2,12})?")
     private String email;
 
+
     private int statusId;
 
     private int branchId;
 
-    private int targetCourseId;
+    private UUID targetCourseId;
 
-    @Size(min = 0, max = 256, message = "Name must be between 2 and 256 characters")
+    @Size(max = 256, message = "Name must be between 2 and 256 characters")
     private String comment;
+
 }

@@ -32,13 +32,24 @@ public class ShareException extends RuntimeException {
 
     public static class ContactNotFoundException extends ShareException {
         public ContactNotFoundException(String message) {
-            super("Course not found: " + message);
+            super("Contact not found: " + message);
         }
     }
 
     public static class ContactAlreadyExistsException extends ShareException {
         public ContactAlreadyExistsException(String phone, String email) {
-            super("Course not found: " + (email == null ? phone : email));
+            super("Contact not found: " + (email == null ? phone : email));
+        }
+    }
+    public static class StudentNotFoundException extends ShareException {
+        public StudentNotFoundException(String message) {
+            super("Student not found: " + message);
+        }
+    }
+
+    public static class StudentAlreadyExistsException extends ShareException {
+        public StudentAlreadyExistsException(String phone, String email) {
+            super("Student not found: " + (email == null ? phone : email));
         }
     }
 
@@ -58,6 +69,12 @@ public class ShareException extends RuntimeException {
     public static class StudentAlreadyInThisGroupException extends ShareException {
         public StudentAlreadyInThisGroupException(String groupId, String studentId) {
             super("Student with id " + studentId + " was already in group with id " + groupId);
+        }
+    }
+    public static class ThisIsStudentException extends ShareException {
+        public ThisIsStudentException() {
+            super("It seems than this is a student, not a contact,so you won't be able to delete it. You'll heave to delete student. " +
+                    "But you don't have to worry about it because the program has already done it for you :)" );
         }
     }
 
