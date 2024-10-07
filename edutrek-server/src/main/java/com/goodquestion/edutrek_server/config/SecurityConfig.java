@@ -61,10 +61,27 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/courses/{id}").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.PUT, "/courses/{id}").hasRole(PRINCIPAL.toString())
 
+                        .requestMatchers(HttpMethod.GET, "/groups", "/groups/{id}", "/groups/paginated").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/groups", "/groups/students/{id}").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/groups/{id}").hasRole(PRINCIPAL.toString())
+                        .requestMatchers(HttpMethod.PUT, "/groups/graduate/{id}", "/groups/{fromId}/move/{toId}",
+                                                        "/groups/archive/students/{id}", "/groups/lecturers/{id}").authenticated()
+
+                        .requestMatchers(HttpMethod.GET, "/lecturers", "/lecturers/{id}").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/lecturers").hasRole(PRINCIPAL.toString())
+                        .requestMatchers(HttpMethod.DELETE, "/lecturers/{id}").hasRole(PRINCIPAL.toString())
+                        .requestMatchers(HttpMethod.PUT, "/lecturers/{id}").authenticated()
+
+                        .requestMatchers(HttpMethod.GET, "/log/{id}").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/log/{id}").authenticated()
+
                         .requestMatchers(HttpMethod.GET, "/statuses", "/statuses/{statusId}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/statuses").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.DELETE, "/statuses/{id}").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.PUT, "/statuses/{id}").hasRole(PRINCIPAL.toString())
+
+                        .requestMatchers(HttpMethod.GET, "/weekdays", "/weekdays/{id}").authenticated()
+
                         .anyRequest().denyAll()
         );
 //        http.csrf(csrf -> csrfTokenRepository());
