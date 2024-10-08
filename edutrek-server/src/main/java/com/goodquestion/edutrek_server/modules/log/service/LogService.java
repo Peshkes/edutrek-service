@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,12 +15,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class LogService {
 
-    LogRepository repository;
+    private final LogRepository repository;
 
     public void add(UUID id, String log) {
         LogDocument document = repository.findById(id)
                 .orElse(new LogDocument(id));
-        document.getLogs().add(LocalDate.now() + " – " + log);
+        List<String> logs = new ArrayList<>(document.getLogs());
+        logs.add(LocalDate.now() + " – " + log);
+        document.setLogs(logs);
         repository.save(document);
     }
 
