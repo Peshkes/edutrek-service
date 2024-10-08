@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -24,6 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthenticationController {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthenticationController.class);
     private final JwtService jwtService;
     private final AuthenticationJWTService authenticationService;
 //    private final AuthenticationBaseService authenticationService;
@@ -55,6 +58,7 @@ public class AuthenticationController {
     @PostMapping("")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> signIn(@Valid @RequestBody AuthenticationDataDto authenticationDataDto, HttpServletResponse response) {
+
         AuthenticationResultDto result = authenticationService.signIn(authenticationDataDto);
 
         response.addCookie(createCookie("accessToken", result.getAccessToken()));
@@ -67,12 +71,10 @@ public class AuthenticationController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> refreshToken(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = jwtService.getRefreshToken(request);
-
         AuthenticationResultDto result = authenticationService.refreshToken(refreshToken);
-
+        log.info("Refreshing token: " + result.getAccessToken() + " " + result.getRefreshToken());
         response.addCookie(createCookie("accessToken", result.getAccessToken()));
         response.addCookie(createCookie("refreshToken", result.getRefreshToken()));
-
         return ResponseEntity.ok("Refresh successful");
     }
 
