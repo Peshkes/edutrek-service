@@ -24,43 +24,38 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if (checkEndpoint(request.getMethod(), request.getServletPath())) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+            String accessToken = jwtService.getAccessToken(request);
+            String username = null;
 
-        String accessToken = jwtService.getAccessToken(request);
-        String username = null;
+            if (accessToken != null) {
+                try {
+                    username = jwtService.getUsername(accessToken);
+                } catch (ExpiredJwtException e) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Access token has expired.");
+                    return;
+                } catch (Exception e) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token: " + e.getMessage());
+                    return;
+                }
+            }
 
-        if (accessToken != null) {
-            try {
-                username = jwtService.getUsername(accessToken);
-            } catch (ExpiredJwtException e) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Access token has expired.");
-                return;
-            } catch (Exception e) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token: " + e.getMessage());
-                return;
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                        username,
+                        null,
+                        jwtService.getRoles(accessToken)
+                                .stream()
+                                .map(SimpleGrantedAuthority::new)
+                                .collect(Collectors.toList()));
+                SecurityContextHolder.getContext().setAuthentication(token);
             }
         }
-
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                    username,
-                    null,
-                    jwtService.getRoles(accessToken)
-                            .stream()
-                            .map(SimpleGrantedAuthority::new)
-                            .collect(Collectors.toList()));
-            SecurityContextHolder.getContext().setAuthentication(token);
-        }
-
         filterChain.doFilter(request, response);
     }
 
     private boolean checkEndpoint(String method, String servletPath) {
-        boolean isLogout = method.equals("POST") && servletPath.equals("/auth/logout");
         boolean isRefresh = method.equals("POST") && servletPath.equals("/auth/refresh");
         boolean isSignIn = method.equals("POST") && servletPath.equals("/auth");
-        return isRefresh || isSignIn || isLogout;
+        return !(isSignIn || isRefresh);
     }
 }

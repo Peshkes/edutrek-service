@@ -70,7 +70,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/groups", "/groups/students/{id}").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/groups/{id}").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.PUT, "/groups/graduate/{id}", "/groups/{fromId}/move/{toId}",
-                                                        "/groups/archive/students/{id}", "/groups/lecturers/{id}").authenticated()
+                                "/groups/archive/students/{id}", "/groups/lecturers/{id}").authenticated()
 
                         .requestMatchers(HttpMethod.GET, "/lecturers", "/lecturers/{id}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/lecturers").hasRole(PRINCIPAL.toString())
@@ -88,13 +88,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/students", "/students/{id}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/students").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/students/{id}").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/students/{id}", "/students/archive/{id}/{reason}","/students/graduate/{id}").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/students/{id}", "/students/archive/{id}/{reason}", "/students/graduate/{id}").authenticated()
 
                         .requestMatchers(HttpMethod.GET, "/weekdays", "/weekdays/{id}").authenticated()
 
                         .anyRequest().denyAll()
         );
 //        http.csrf(csrf -> csrfTokenRepository());
+//        http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.csrf(AbstractHttpConfigurer::disable);
         http.cors(cors -> corsConfigurationSource());
         http.addFilterBefore(expiredPasswordFilter, BasicAuthenticationFilter.class);
@@ -109,7 +110,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of("*"));
 //        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://10.0.0.6:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
-//        configuration.setAllowCredentials(true);
+        configuration.setAllowCredentials(true);
         configuration.addAllowedHeader("*");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

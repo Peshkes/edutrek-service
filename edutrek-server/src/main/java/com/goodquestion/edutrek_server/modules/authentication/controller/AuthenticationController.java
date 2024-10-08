@@ -56,7 +56,6 @@ public class AuthenticationController {
     }
 
     @PostMapping("")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> signIn(@Valid @RequestBody AuthenticationDataDto authenticationDataDto, HttpServletResponse response) {
 
         AuthenticationResultDto result = authenticationService.signIn(authenticationDataDto);
@@ -68,13 +67,13 @@ public class AuthenticationController {
     }
 
     @PostMapping("/refresh")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> refreshToken(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = jwtService.getRefreshToken(request);
         AuthenticationResultDto result = authenticationService.refreshToken(refreshToken);
-        log.info("Refreshing token: " + result.getAccessToken() + " " + result.getRefreshToken());
+
         response.addCookie(createCookie("accessToken", result.getAccessToken()));
         response.addCookie(createCookie("refreshToken", result.getRefreshToken()));
+        log.info("Refreshing token: " + result.getAccessToken() + " " + result.getRefreshToken());
         return ResponseEntity.ok("Refresh successful");
     }
 
@@ -107,7 +106,7 @@ public class AuthenticationController {
     }
 
     @PutMapping("/login/{id}")
-    public ResponseEntity<String> changePassword(@PathVariable @UUID String id, @Valid @RequestBody ChangeLoginRequestDto changeLoginRequest) {
+    public ResponseEntity<String> changeLogin(@PathVariable @UUID String id, @Valid @RequestBody ChangeLoginRequestDto changeLoginRequest) {
         authenticationService.changeLogin(java.util.UUID.fromString(id), changeLoginRequest);
         return new ResponseEntity<>("Login changed", HttpStatus.OK);
     }

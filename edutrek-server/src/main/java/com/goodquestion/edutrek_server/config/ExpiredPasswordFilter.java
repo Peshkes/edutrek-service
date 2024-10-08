@@ -51,10 +51,7 @@ public class ExpiredPasswordFilter extends GenericFilterBean {
     }
 
     private boolean checkEndpoint(String method, String servletPath) {
-        boolean isChange = method.equals("PUT") && servletPath.equals("/auth/password");
-        boolean isCSRF = method.equals("GET") && servletPath.equals("/auth/csrf");
-        boolean isSignIn = method.equals("POST") && servletPath.equals("/auth");
-        return !(isChange || isCSRF || isSignIn);
+        return !method.equals("PUT") && servletPath.equals("/auth/password");
     }
 
 }

@@ -4,6 +4,7 @@ import com.goodquestion.edutrek_server.error.AuthenticationException.*;
 
 import static com.goodquestion.edutrek_server.error.ShareException.*;
 
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSourceResolvable;
@@ -22,6 +23,11 @@ import java.util.stream.Collectors;
 @Slf4j
 @ControllerAdvice
 public class ErrorController  {
+
+    @ExceptionHandler(MalformedJwtException.class)
+    ResponseEntity<String> malformedJwtExceptionHandler(MalformedJwtException e) {
+        return returnResponse(e.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
 
     @ExceptionHandler(LogNotFoundException.class)
     ResponseEntity<String> logNotFoundExceptionHandler(LogNotFoundException e) {
