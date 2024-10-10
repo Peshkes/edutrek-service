@@ -7,19 +7,19 @@ public class DatabaseException extends RuntimeException {
 
     public static class DatabaseAddingException extends DatabaseException {
         public DatabaseAddingException(String message) {
-            super("Database error while adding: " + message);
+            super(DatabaseErrors.ADDING + message);
         }
     }
 
     public static class DatabaseDeletingException extends DatabaseException {
         public DatabaseDeletingException(String message) {
-            super("Database error while deleting: " + message);
+            super(DatabaseErrors.DELETING + message);
         }
     }
 
     public static class DatabaseUpdatingException extends DatabaseException {
         public DatabaseUpdatingException(String message) {
-            super("Database error while updating: " + message);
+            super(DatabaseErrors.UPDATING + message);
         }
     }
 }

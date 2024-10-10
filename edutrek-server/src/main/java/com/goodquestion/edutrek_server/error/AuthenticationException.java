@@ -3,7 +3,6 @@ package com.goodquestion.edutrek_server.error;
 import java.util.UUID;
 
 
-
 public class AuthenticationException extends RuntimeException {
     public AuthenticationException(String message) {
         super(message);
@@ -11,64 +10,61 @@ public class AuthenticationException extends RuntimeException {
 
     public static class UserNotFoundException extends AuthenticationException {
         public UserNotFoundException(UUID id) {
-            super("User not found with id: " + id);
+            super(AuthenticationErrors.USER_NOT_FOUND + id);
         }
     }
 
     public static class UserAlreadyExistsException extends AuthenticationException {
         public UserAlreadyExistsException(String username) {
-            super("User already exists with username: " + username);
+            super(AuthenticationErrors.USER_ALREADY_EXISTS + username);
         }
     }
 
     public static class UsernameNotFoundException extends AuthenticationException {
         public UsernameNotFoundException(String username) {
-            super("User not found with username: " + username);
+            super(AuthenticationErrors.USERNAME_NOT_FOUND + username);
         }
     }
 
     public static class WrongPasswordException extends AuthenticationException {
         public WrongPasswordException() {
-            super("Wrong password. Please try again.");
+            super(AuthenticationErrors.WRONG_PASSWORD);
         }
     }
 
     public static class NoAccountsException extends AuthenticationException {
         public NoAccountsException() {
-            super("No accounts found.");
+            super(AuthenticationErrors.NO_ACCOUNTS);
         }
     }
 
     public static class LoginAlreadyExistsException extends AuthenticationException {
         public LoginAlreadyExistsException(String login) {
-            super("Account already exists with login: " + login);
+            super(AuthenticationErrors.LOGIN_ALREADY_EXISTS + login);
         }
     }
 
     public static class PasswordAlreadyUsedException extends AuthenticationException {
         public PasswordAlreadyUsedException() {
-            super("Password already used. Please try again.");
+            super(AuthenticationErrors.PASSWORD_ALREADY_USED);
         }
     }
 
     public static class RoleExistsException extends AuthenticationException {
-
-    	public RoleExistsException(String role) {
-    		super("Role " + role + " already exists");
-    	}
+        public RoleExistsException(String role) {
+            super(AuthenticationErrors.ROLE_EXISTS + role);
+        }
     }
-    
-    public static class RoleNotExistsException extends AuthenticationException {
 
-    	public RoleNotExistsException(String role) {
-    		super("Role " + role + " doest't exists");
-    	}
+    public static class RoleNotExistsException extends AuthenticationException {
+        public RoleNotExistsException(String role) {
+            super(AuthenticationErrors.ROLE_NOT_EXISTS + role);
+        }
     }
 
     public static class RefreshTokenNotFoundException extends AuthenticationException {
         public RefreshTokenNotFoundException() {
-            super("Refresh token not found.");
+            super(AuthenticationErrors.REFRESH_TOKEN_NOT_FOUND);
         }
     }
-
 }
