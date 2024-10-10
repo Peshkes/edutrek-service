@@ -1,25 +1,21 @@
 package com.goodquestion.edutrek_server.modules.studentInformation.dto;
 
 
-import com.goodquestion.edutrek_server.modules.contacts.dto.ContactsDataDto;
-import lombok.*;
 
-import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+
 
 
 @NoArgsConstructor
 @Getter
 @Setter
-public class StudentsInfoDataDto  extends ContactsDataDto {
-
+@AllArgsConstructor
+public class StudentsInfoDataDto {
 
     private int fullPayment;
     private boolean documentsDone;
-
-    public StudentsInfoDataDto(String contactName, String phone, String email, int statusId, int branchId, UUID targetCourseId, String comment, int fullPayment, boolean documentsDone) {
-        super(contactName, phone, email, statusId, branchId, targetCourseId, comment);
-
-        this.fullPayment = fullPayment;
-        this.documentsDone = documentsDone;
-    }
 }

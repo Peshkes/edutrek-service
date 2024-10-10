@@ -57,9 +57,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/branches/{id}").hasRole(PRINCIPAL.toString())
 
                         .requestMatchers(HttpMethod.GET, "/contacts", "/contacts/{id}").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/contacts").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/contacts", "/contacts/promote/{id}").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/contacts/{id}").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/contacts/{id}", "/contacts/graduate/{id}/{reason}").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/contacts/{id}", "/contacts/archive/{id}/{reason}").authenticated()
 
                         .requestMatchers(HttpMethod.GET, "/courses", "/courses/{id}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/courses").hasRole(PRINCIPAL.toString())
@@ -94,10 +94,10 @@ public class SecurityConfig {
 
                         .anyRequest().denyAll()
         );
-//        http.csrf(csrf -> csrfTokenRepository());
+        http.csrf(csrf -> csrfTokenRepository());
 //        http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.csrf(AbstractHttpConfigurer::disable);
-        http.cors(cors -> corsConfigurationSource());
+        //      http.cors(cors -> corsConfigurationSource());
         http.addFilterBefore(expiredPasswordFilter, BasicAuthenticationFilter.class);
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 

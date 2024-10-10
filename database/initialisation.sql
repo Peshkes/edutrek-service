@@ -4,7 +4,7 @@ EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE statuses
 (
     status_id   serial PRIMARY KEY,
-    status_name varchar(15) NOT NULL
+    status_name varchar(15) NOT NULL UNIQUE
 );
 
 INSERT INTO statuses (status_name)

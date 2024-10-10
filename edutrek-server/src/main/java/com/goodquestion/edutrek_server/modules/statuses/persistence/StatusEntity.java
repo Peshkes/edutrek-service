@@ -15,10 +15,11 @@ public class StatusEntity {
     @Column(name = "status_id")
     private int statusId;
     @Setter
-    @Column(name = "status_name")
+    @Column(name = "status_name", unique = true)
+
     private String statusName;
 
-    public StatusEntity(String branchName) {
-        this.statusName = branchName;
+    public StatusEntity(String statusName) {
+        this.statusName = statusName;
     }
 }

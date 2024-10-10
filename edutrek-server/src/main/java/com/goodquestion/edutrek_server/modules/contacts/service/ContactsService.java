@@ -8,8 +8,11 @@ import com.goodquestion.edutrek_server.modules.contacts.archive.*;
 import com.goodquestion.edutrek_server.modules.contacts.dto.*;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.*;
 import com.goodquestion.edutrek_server.modules.statuses.persistence.StatusRepository;
+import com.goodquestion.edutrek_server.modules.studentInformation.dto.StudentsInfoDataDto;
+import com.goodquestion.edutrek_server.modules.studentInformation.persistence.StudentInfoEntity;
 import com.goodquestion.edutrek_server.modules.studentInformation.persistence.StudentsInfoRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -17,8 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ContactsService {
@@ -50,6 +55,7 @@ public class ContactsService {
     }
 
     @Transactional
+
     public UUID addEntity(ContactsDataDto contactData) {
         ContactsEntity entity = contactRepository.findByPhoneOrEmail(contactData.getPhone(), contactData.getEmail());
         if (entity == null) {
@@ -62,13 +68,12 @@ public class ContactsService {
             }
         } else
             throw new ContactAlreadyExistsException(contactData.getPhone(), contactData.getEmail());
-
     }
 
     @Transactional
     public void deleteById(UUID id) {
         if (studentRepository.existsById(id)) {
-            restTemplate.delete("http://localhost:8080/students/{id}");
+            restTemplate.delete("http://localhost:8080/students/" + id);
         } else {
             deleteContactById(id);
         }
@@ -105,7 +110,7 @@ public class ContactsService {
     @Transactional
     public void moveToArchiveById(UUID id, String reason) {
         if (studentRepository.existsById(id)) {
-            restTemplate.put("http://localhost:8080/students/archive/{id}/{reason}",null);
+            restTemplate.put("http://localhost:8080/students/archive/" + id + "/" + reason, null);
         } else {
             moveContactToArchiveById(id, reason);
         }
@@ -113,21 +118,46 @@ public class ContactsService {
 
     @Transactional
     public void moveContactToArchiveById(UUID id, String reason) {
-            ContactsEntity contact = contactRepository.findById(id).orElseThrow(() -> new ContactNotFoundException(id.toString()));
+        if (archiveRepository.existsById(id))
+            throw new ContactAlreadyArchivedException(id.toString());
+        ContactsEntity contact = contactRepository.findById(id).orElseThrow(() -> new ContactNotFoundException(id.toString()));
+        int statusId = statusRepository.getStatusEntityByStatusName("Archive").getStatusId();
+        contact.setStatusId(statusId);
+        try {
+            archiveRepository.save(new ContactArchiveDocument(id, contact.getContactName(), contact.getPhone(), contact.getEmail(), contact.getStatusId(), contact.getBranchId(), contact.getTargetCourseId(), reason, LocalDate.now()));
+        } catch (Exception e) {
+            throw new DatabaseAddingException(e.getMessage());
+        }
+        try {
+            contactRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new DatabaseDeletingException(e.getMessage());
+        }
+    }
 
-            int statusId = statusRepository.getStatusIdByStatusName("Archive");
+    @Transactional
+    public void promoteContactToStudentById(UUID id, StudentsInfoDataDto studentData) {
+        ContactsEntity contact = contactRepository.findById(id).orElseThrow(() -> new ContactNotFoundException(id.toString()));
+        if (!studentRepository.existsById(id)) {
+            int statusId = statusRepository.getStatusEntityByStatusName("Student").getStatusId();
             contact.setStatusId(statusId);
             try {
-                archiveRepository.save(new ContactArchiveDocument(id, contact.getContactName(), contact.getPhone(), contact.getEmail(), contact.getStatusId(), contact.getBranchId(), contact.getTargetCourseId(), reason, LocalDate.now()));
+                studentRepository.save(new StudentInfoEntity(
+                        id,
+                        contact.getContactName(),
+                        contact.getPhone(),
+                        contact.getEmail(),
+                        statusId,
+                        contact.getBranchId(),
+                        contact.getTargetCourseId(),
+                        contact.getComment(),
+                        studentData.getFullPayment(),
+                        studentData.isDocumentsDone()));
             } catch (Exception e) {
                 throw new DatabaseAddingException(e.getMessage());
             }
-            try {
-                contactRepository.deleteById(id);
-            } catch (Exception e) {
+        }
 
-                throw new DatabaseDeletingException("Couldn't move contact to archive. " + e.getMessage());
-            }
     }
 
 }
