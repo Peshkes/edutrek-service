@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @ControllerAdvice
-public class ErrorController  {
+public class ErrorController {
 
     @ExceptionHandler(MalformedJwtException.class)
     ResponseEntity<String> malformedJwtExceptionHandler(MalformedJwtException e) {
@@ -68,15 +68,15 @@ public class ErrorController  {
     ResponseEntity<String> passwordAlreadyUsedExceptionHandler(PasswordAlreadyUsedException e) {
         return returnResponse(e.getMessage(), HttpStatus.CONFLICT);
     }
-    
+
     @ExceptionHandler(RoleExistsException.class)
     ResponseEntity<String> passwordAlreadyUsedExceptionHandler(RoleExistsException e) {
-    	return returnResponse(e.getMessage(), HttpStatus.CONFLICT);
+        return returnResponse(e.getMessage(), HttpStatus.CONFLICT);
     }
-    
+
     @ExceptionHandler(RoleNotExistsException.class)
     ResponseEntity<String> passwordAlreadyUsedExceptionHandler(RoleNotExistsException e) {
-    	return returnResponse(e.getMessage(), HttpStatus.CONFLICT);
+        return returnResponse(e.getMessage(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(LoginAlreadyExistsException.class)
@@ -170,6 +170,11 @@ public class ErrorController  {
 
     @ExceptionHandler(ContactAlreadyExistsException.class)
     ResponseEntity<String> contactAlreadyExistsException(ContactAlreadyExistsException e) {
+        return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ContactAlreadyArchivedException.class)
+    ResponseEntity<String> contactAlreadyArchivedException(ContactAlreadyArchivedException e) {
         return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 

@@ -3,7 +3,8 @@ package com.goodquestion.edutrek_server.modules.studentInformation.controller;
 
 
 import com.goodquestion.edutrek_server.modules.studentInformation.dto.StudentInfoSearchDto;
-import com.goodquestion.edutrek_server.modules.studentInformation.dto.StudentsInfoDataDto;
+import com.goodquestion.edutrek_server.modules.studentInformation.dto.StudentsAddDto;
+import com.goodquestion.edutrek_server.modules.studentInformation.dto.StudentsInfoDataFromContactDto;
 
 import com.goodquestion.edutrek_server.modules.studentInformation.persistence.StudentInfoEntity;
 
@@ -42,34 +43,34 @@ public class StudentsInfoController {
     }
 
     @PostMapping("")
-    public ResponseEntity<String> addEntity(@RequestBody @Valid StudentsInfoDataDto studentInfoData) {
-        studentsInfoService.addEntity(studentInfoData);
+    public ResponseEntity<String> addEntity(@RequestBody @Valid StudentsAddDto studentsAddDto) {
+        studentsInfoService.addEntity(studentsAddDto.contactData(), studentsAddDto.studentsInfoData());
         return new ResponseEntity<>("Student created", HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteById(@PathVariable UUID id) {
         studentsInfoService.deleteById(id);
-        return new ResponseEntity<>("Contact deleted", HttpStatus.OK);
+        return new ResponseEntity<>("Student deleted", HttpStatus.OK);
     }
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateById(@PathVariable UUID id, @RequestBody @Valid StudentsInfoDataDto contactData) {
+    public ResponseEntity<String> updateById(@PathVariable UUID id, @RequestBody @Valid StudentsInfoDataFromContactDto contactData) {
         studentsInfoService.updateById(id, contactData);
-        return new ResponseEntity<>("Contact updated", HttpStatus.OK);
+        return new ResponseEntity<>("Student updated", HttpStatus.OK);
     }
 
     @PutMapping("/archive/{id}/{reason}")
     public ResponseEntity<String> moveToArchiveById(@PathVariable UUID id,@PathVariable @DefaultValue("") String reason) {
         studentsInfoService.moveToArchiveById(id, reason);
-        return new ResponseEntity<>("Contact moved to archive", HttpStatus.OK);
+        return new ResponseEntity<>("Student moved to archive", HttpStatus.OK);
     }
 
     @PutMapping("/graduate/{id}")
     public ResponseEntity<String> graduateById(@PathVariable UUID id) {
         studentsInfoService.graduateById(id);
-        return new ResponseEntity<>("Contact moved to archive", HttpStatus.OK);
+        return new ResponseEntity<>("Student moved to archive", HttpStatus.OK);
     }
 
 

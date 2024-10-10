@@ -5,6 +5,7 @@ import com.goodquestion.edutrek_server.modules.contacts.dto.ContactSearchDto;
 import com.goodquestion.edutrek_server.modules.contacts.dto.ContactsDataDto;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.ContactsEntity;
 import com.goodquestion.edutrek_server.modules.contacts.service.ContactsService;
+import com.goodquestion.edutrek_server.modules.studentInformation.dto.StudentsInfoDataDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -12,11 +13,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
 import java.util.UUID;
 
+@Validated
 @RestController
 @RequestMapping("/contacts")
 @RequiredArgsConstructor
@@ -27,10 +30,10 @@ public class ContactsController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public ContactSearchDto getAll(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) Integer statusId
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "pagesize",defaultValue = "10") int pageSize,
+            @RequestParam(name = "search",required = false) String search,
+            @RequestParam(name = "statusid",required = false) Integer statusId
     ) {
         return contactsService.getAll(page, pageSize, search, statusId);
     }
@@ -60,11 +63,25 @@ public class ContactsController {
         return new ResponseEntity<>("Contact updated", HttpStatus.OK);
     }
 
-    @PutMapping("/graduate/{id}/{reason}")
+    @PutMapping("/archive/{id}/{reason}")
     public ResponseEntity<String> moveToArchiveById(@PathVariable UUID id,@PathVariable @DefaultValue("") String reason) {
         contactsService.moveToArchiveById(id,reason);
         return new ResponseEntity<>("Contact moved to archive", HttpStatus.OK);
     }
+
+    @PostMapping("/promote/{id}")
+    public ResponseEntity<String> promoteContactToStudentById(@PathVariable UUID id,@RequestBody @Valid StudentsInfoDataDto studentData) {
+        contactsService.promoteContactToStudentById(id,studentData);
+        return new ResponseEntity<>("Contact promoted to student", HttpStatus.OK);
+    }
+//    @PostMapping("/test/{id}/")
+//    public ResponseEntity<String> test (@PathVariable UUID id,@RequestParam StudentsInfoDataDto studentData) {
+//        contactsService.promoteContactToStudentById(id,studentData);
+//        return new ResponseEntity<>("Contact promoted to student", HttpStatus.OK);
+//    }
+
+
+
 
 
 }

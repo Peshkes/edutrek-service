@@ -1,6 +1,9 @@
 package com.goodquestion.edutrek_server.modules.studentInformation.service;
+
 import com.goodquestion.edutrek_server.error.DatabaseException.*;
 import com.goodquestion.edutrek_server.error.ShareException.*;
+import com.goodquestion.edutrek_server.modules.contacts.dto.ContactsDataDto;
+import com.goodquestion.edutrek_server.modules.contacts.persistence.ContactsEntity;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.ContactsRepository;
 import com.goodquestion.edutrek_server.modules.studentInformation.archive.StudentInfoArchiveDocument;
 import com.goodquestion.edutrek_server.modules.contacts.service.ContactsService;
@@ -17,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import static com.goodquestion.edutrek_server.error.ShareException.ContactAlreadyExistsException;
 import static com.goodquestion.edutrek_server.error.ShareException.ContactNotFoundException;
 
 @Service
@@ -25,7 +27,7 @@ import static com.goodquestion.edutrek_server.error.ShareException.ContactNotFou
 public class StudentsInfoService {
 
     private final StudentsInfoRepository repository;
-    private final ContactsRepository contactRepository;
+    private final ContactsRepository contactsRepository;
     private final ContactsService contactService;
     private final StudentsInfoArchiveRepository archiveRepository;
 
@@ -51,19 +53,16 @@ public class StudentsInfoService {
     }
 
     @Transactional
-    public void addEntity(StudentsInfoDataDto contactData) {
-        UUID contactId = contactService.addEntity(contactData);
-        StudentInfoEntity entity = repository.findByPhoneOrEmail(contactData.getPhone(), contactData.getEmail());
-        if (entity == null) {
-            try {
-                repository.save(new StudentInfoEntity(contactId, contactData.getFullPayment(), contactData.isDocumentsDone()));
-            } catch (Exception e) {
-                throw new DatabaseAddingException(e.getMessage());
-            }
-        } else
-            throw new ContactAlreadyExistsException(contactData.getPhone(), contactData.getEmail());
-
+    public void addEntity(ContactsDataDto contactData, StudentsInfoDataDto studentData) {
+        ContactsEntity contact = contactsRepository.findByPhoneOrEmail(contactData.getPhone(), contactData.getEmail());
+        if (contact == null) {
+            UUID contactId = contactService.addEntity(contactData);
+            contactService.promoteContactToStudentById(contactId, studentData);
+        } else {
+            contactService.promoteContactToStudentById(contact.getContactId(), studentData);
+        }
     }
+
 
     @Transactional
     public void deleteById(UUID id) {
@@ -73,15 +72,16 @@ public class StudentsInfoService {
         } catch (Exception e) {
             throw new DatabaseDeletingException(e.getMessage());
         }
-        contactRepository.deleteById(id);
+        if (contactsRepository.existsById(id))
+            contactsRepository.deleteById(id);
     }
 
     @Transactional
-    public void updateById(UUID id, StudentsInfoDataDto contactData) {
+    public void updateById(UUID id, StudentsInfoDataFromContactDto studentData) {
         StudentInfoEntity entity = repository.findById(id).orElseThrow(() -> new StudentNotFoundException(id.toString()));
-        contactService.updateById(id, contactData);
-        entity.setFullPayment(contactData.getFullPayment());
-        entity.setDocumentsDone(contactData.isDocumentsDone());
+        contactService.updateById(id, studentData);
+        entity.setFullPayment(studentData.getFullPayment());
+        entity.setDocumentsDone(studentData.isDocumentsDone());
         try {
             repository.save(entity);
         } catch (Exception e) {
@@ -93,20 +93,20 @@ public class StudentsInfoService {
     public void moveToArchiveById(UUID id, String reason) {
         StudentInfoEntity student = repository.findById(id).orElseThrow(() -> new StudentNotFoundException(id.toString()));
         try {
-            archiveRepository.save(new StudentInfoArchiveDocument(id, student.getFullPayment(), student.isDocumentsDone(), LocalDate.now(),reason));
+            archiveRepository.save(new StudentInfoArchiveDocument(id, student.getFullPayment(), student.isDocumentsDone(), LocalDate.now(), reason));
         } catch (Exception e) {
             throw new DatabaseAddingException(e.getMessage());
         }
+        contactService.moveContactToArchiveById(id, reason);
         try {
             repository.deleteById(id);
         } catch (Exception e) {
             throw new DatabaseDeletingException(e.getMessage());
         }
-        contactService.moveContactToArchiveById(id, reason);
     }
 
     @Transactional
     public void graduateById(UUID id) {
-        moveToArchiveById(id,"Finished course and graduated");
+        moveToArchiveById(id, "Finished course and graduated");
     }
 }

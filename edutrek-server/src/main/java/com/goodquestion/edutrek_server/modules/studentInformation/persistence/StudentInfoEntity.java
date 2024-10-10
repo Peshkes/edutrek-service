@@ -30,9 +30,9 @@ public class StudentInfoEntity extends ContactsEntity {
 //    @JoinColumn(name="contact_id", referencedColumnName = "contact_id")
 //    private ContactsEntity contact;
 
-    public StudentInfoEntity(String contactName, String phone, String email, int statusId, int branchId, UUID targetCourseId, String comment, int fullPayment, boolean documentsDone) {
+    public StudentInfoEntity(UUID contactId, String contactName, String phone, String email, int statusId, int branchId, UUID targetCourseId, String comment, int fullPayment, boolean documentsDone) {
         super(contactName, phone, email, statusId, branchId, targetCourseId, comment);
-        this.contactId = super.getContactId();
+        this.contactId = contactId;
         this.fullPayment = fullPayment;
         this.documentsDone = documentsDone;
     }

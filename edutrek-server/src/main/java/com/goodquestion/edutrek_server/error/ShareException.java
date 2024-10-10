@@ -38,9 +38,16 @@ public class ShareException extends RuntimeException {
 
     public static class ContactAlreadyExistsException extends ShareException {
         public ContactAlreadyExistsException(String phone, String email) {
-            super("Contact not found: " + (email == null ? phone : email));
+            super("Contact already exists: " + (email == null ? phone : email));
         }
     }
+
+    public static class ContactAlreadyArchivedException extends ShareException {
+        public ContactAlreadyArchivedException(String message) {
+            super("Contact already exists in the archive: " + message);
+        }
+    }
+
     public static class StudentNotFoundException extends ShareException {
         public StudentNotFoundException(String message) {
             super("Student not found: " + message);
@@ -49,7 +56,7 @@ public class ShareException extends RuntimeException {
 
     public static class StudentAlreadyExistsException extends ShareException {
         public StudentAlreadyExistsException(String phone, String email) {
-            super("Student not found: " + (email == null ? phone : email));
+            super("Student already exists: " + (email == null ? phone : email));
         }
     }
 
