@@ -41,7 +41,7 @@ VALUES ('Full stack development', 'FSD'),
 
 CREATE TABLE contacts
 (
-    contact_id       uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    contact_id       uuid PRIMARY KEY default uuid_generate_v4(),
     contact_name     varchar(256) NOT NULL,
     phone            varchar(15)  NOT NULL,
     email            varchar(256) NOT NULL,
@@ -54,13 +54,26 @@ CREATE TABLE contacts
     comment          varchar(256)
 );
 
+CREATE TABLE contacts_archive
+(
+    reason_of_archivation varchar(100) NOT NULL,
+    archivation_date      date         NOT NULL
+) INHERITS (contacts);
+
 CREATE TABLE students_information
 (
-    contact_id     uuid PRIMARY KEY,
-    FOREIGN KEY (contact_id) REFERENCES contacts (contact_id) ON DELETE CASCADE,
+    student_num    uuid UNIQUE default uuid_generate_v4(),
     full_payment   int     NOT NULL,
     documents_done boolean NOT NULL
-);
+) INHERITS (contacts);
+
+CREATE TABLE students_archive
+(
+    reason_of_archivation varchar(100) NOT NULL,
+    archivation_date      date         NOT NULL
+) INHERITS (students_information);
+
+
 
 CREATE TABLE payment_types
 (
@@ -77,8 +90,8 @@ VALUES ('Credit card'),
 CREATE TABLE payment_information
 (
     payment_id      uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    contact_id      uuid,
-    FOREIGN KEY (contact_id) REFERENCES students_information (contact_id) ON DELETE CASCADE,
+    student_num      uuid,
+    FOREIGN KEY (student_num) REFERENCES students_information (student_num),
     payment_date    date NOT NULL,
     payment_type_id int  NOT NULL,
     FOREIGN KEY (payment_type_id) REFERENCES payment_types (payment_type_id),
@@ -86,9 +99,13 @@ CREATE TABLE payment_information
     payment_details varchar(256)
 );
 
+CREATE TABLE payment_information_archive
+(
+) INHERITS (payment_information);
+
 CREATE TABLE groups
 (
-    group_id         uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    group_id         uuid PRIMARY KEY default uuid_generate_v4(),
     group_name       varchar(25)  NOT NULL,
     start_date       date         NOT NULL,
     finish_date      date         NOT NULL,
@@ -101,15 +118,25 @@ CREATE TABLE groups
     deactivate_after boolean      NOT NULL
 );
 
+CREATE TABLE groups_archive
+(
+    archivation_date date NOT NULL
+) INHERITS (groups);
+
 CREATE TABLE students_by_group
 (
-    contact_id uuid NOT NULL,
-    FOREIGN KEY (contact_id) REFERENCES students_information (contact_id),
-    group_id   uuid NOT NULL,
+    student_num uuid    NOT NULL,
+    FOREIGN KEY (student_num) REFERENCES students_information (student_num),
+    group_id   uuid    NOT NULL,
     FOREIGN KEY (group_id) REFERENCES groups (group_id),
-    PRIMARY KEY (contact_id, group_id),
-    is_active boolean NOT NULL
+    PRIMARY KEY (student_num, group_id),
+    is_active  boolean NOT NULL
 );
+
+CREATE TABLE students_by_group_archive
+(
+    archivation_date date NOT NULL
+) INHERITS (students_by_group);
 
 CREATE TABLE lecturers
 (
@@ -122,15 +149,27 @@ CREATE TABLE lecturers
     comment       varchar(256)
 );
 
+CREATE TABLE lecturers_archive
+(
+    reason_of_archivation varchar(100) NOT NULL,
+    archivation_date      date         NOT NULL
+) INHERITS (lecturers);
+
 CREATE TABLE lecturers_by_group
 (
-    lecturer_id uuid NOT NULL,
+    lecturer_id   uuid    NOT NULL,
     FOREIGN KEY (lecturer_id) REFERENCES lecturers (lecturer_id),
-    group_id    uuid NOT NULL,
+    group_id      uuid    NOT NULL,
     FOREIGN KEY (group_id) REFERENCES groups (group_id),
     PRIMARY KEY (lecturer_id, group_id),
-    is_webinarist boolean NOT NULL
+    is_webinarist boolean NOT NULL,
+    is_active     boolean NOT NULL
 );
+
+CREATE TABLE lecturers_by_group_archive
+(
+    archivation_date date NOT NULL
+) INHERITS (lecturers_by_group);
 
 CREATE TABLE weekdays
 (
@@ -156,6 +195,10 @@ CREATE TABLE webinars_by_weekday
     PRIMARY KEY (group_id, weekday_id)
 );
 
+CREATE TABLE webinars_by_weekday_archive
+(
+) INHERITS (webinars_by_weekday);
+
 CREATE TABLE lessons_by_weekday
 (
     group_id   uuid NOT NULL,
@@ -164,5 +207,9 @@ CREATE TABLE lessons_by_weekday
     FOREIGN KEY (weekday_id) REFERENCES weekdays (weekday_id),
     PRIMARY KEY (group_id, weekday_id)
 );
+
+CREATE TABLE lessons_by_weekday_archive
+(
+) INHERITS (lessons_by_weekday);
 
 
