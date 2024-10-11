@@ -1,5 +1,5 @@
 CREATE
-EXTENSION IF NOT EXISTS "uuid-ossp";
+    EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE statuses
 (
@@ -56,22 +56,58 @@ CREATE TABLE contacts
 
 CREATE TABLE contacts_archive
 (
+    contact_id            uuid PRIMARY KEY default uuid_generate_v4(),
+    contact_name          varchar(256) NOT NULL,
+    phone                 varchar(15)  NOT NULL,
+    email                 varchar(256) NOT NULL,
+    status_id             int          NOT NULL,
+    FOREIGN KEY (status_id) REFERENCES statuses (status_id),
+    branch_id             int          NOT NULL,
+    FOREIGN KEY (branch_id) REFERENCES branches (branch_id),
+    target_course_id      uuid         NOT NULL,
+    FOREIGN KEY (target_course_id) REFERENCES courses (course_id),
+    comment               varchar(256),
     reason_of_archivation varchar(100) NOT NULL,
     archivation_date      date         NOT NULL
-) INHERITS (contacts);
+);
 
 CREATE TABLE students_information
 (
-    student_num    uuid UNIQUE default uuid_generate_v4(),
-    full_payment   int     NOT NULL,
-    documents_done boolean NOT NULL
-) INHERITS (contacts);
+    contact_id       uuid PRIMARY KEY default uuid_generate_v4(),
+    contact_name     varchar(256) NOT NULL,
+    phone            varchar(15)  NOT NULL,
+    email            varchar(256) NOT NULL,
+    status_id        int          NOT NULL,
+    FOREIGN KEY (status_id) REFERENCES statuses (status_id),
+    branch_id        int          NOT NULL,
+    FOREIGN KEY (branch_id) REFERENCES branches (branch_id),
+    target_course_id uuid         NOT NULL,
+    FOREIGN KEY (target_course_id) REFERENCES courses (course_id),
+    comment          varchar(256),
+    student_num      uuid UNIQUE      default uuid_generate_v4(),
+    full_payment     int          NOT NULL,
+    documents_done   boolean      NOT NULL
+);
 
 CREATE TABLE students_archive
 (
+    contact_id            uuid PRIMARY KEY default uuid_generate_v4(),
+    contact_name          varchar(256) NOT NULL,
+    phone                 varchar(15)  NOT NULL,
+    email                 varchar(256) NOT NULL,
+    status_id             int          NOT NULL,
+    FOREIGN KEY (status_id) REFERENCES statuses (status_id),
+    branch_id             int          NOT NULL,
+    FOREIGN KEY (branch_id) REFERENCES branches (branch_id),
+    target_course_id      uuid         NOT NULL,
+    FOREIGN KEY (target_course_id) REFERENCES courses (course_id),
+    comment               varchar(256),
+    student_num           uuid UNIQUE      default uuid_generate_v4(),
+    full_payment          int          NOT NULL,
+    documents_done        boolean      NOT NULL,
     reason_of_archivation varchar(100) NOT NULL,
     archivation_date      date         NOT NULL
-) INHERITS (students_information);
+);
 
 
 
@@ -90,7 +126,7 @@ VALUES ('Credit card'),
 CREATE TABLE payment_information
 (
     payment_id      uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    student_num      uuid,
+    student_num     uuid,
     FOREIGN KEY (student_num) REFERENCES students_information (student_num),
     payment_date    date NOT NULL,
     payment_type_id int  NOT NULL,
@@ -101,7 +137,15 @@ CREATE TABLE payment_information
 
 CREATE TABLE payment_information_archive
 (
-) INHERITS (payment_information);
+    payment_id      uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    student_num     uuid,
+    FOREIGN KEY (student_num) REFERENCES students_information (student_num),
+    payment_date    date NOT NULL,
+    payment_type_id int  NOT NULL,
+    FOREIGN KEY (payment_type_id) REFERENCES payment_types (payment_type_id),
+    payment_amount  int  NOT NULL,
+    payment_details varchar(256)
+);
 
 CREATE TABLE groups
 (
@@ -120,23 +164,40 @@ CREATE TABLE groups
 
 CREATE TABLE groups_archive
 (
-    archivation_date date NOT NULL
-) INHERITS (groups);
+    group_id         uuid PRIMARY KEY default uuid_generate_v4(),
+    group_name       varchar(25)  NOT NULL,
+    start_date       date         NOT NULL,
+    finish_date      date         NOT NULL,
+    is_active        boolean      NOT NULL,
+    course_id        uuid         NOT NULL,
+    FOREIGN KEY (course_id) REFERENCES courses (course_id),
+    slack_link       varchar(256) NOT NULL,
+    whats_app_link   varchar(256) NOT NULL,
+    skype_link       varchar(256) NOT NULL,
+    deactivate_after boolean      NOT NULL,
+    archivation_date date         NOT NULL
+);
 
 CREATE TABLE students_by_group
 (
     student_num uuid    NOT NULL,
     FOREIGN KEY (student_num) REFERENCES students_information (student_num),
-    group_id   uuid    NOT NULL,
+    group_id    uuid    NOT NULL,
     FOREIGN KEY (group_id) REFERENCES groups (group_id),
     PRIMARY KEY (student_num, group_id),
-    is_active  boolean NOT NULL
+    is_active   boolean NOT NULL
 );
 
 CREATE TABLE students_by_group_archive
 (
-    archivation_date date NOT NULL
-) INHERITS (students_by_group);
+    student_num      uuid    NOT NULL,
+    FOREIGN KEY (student_num) REFERENCES students_information (student_num),
+    group_id         uuid    NOT NULL,
+    FOREIGN KEY (group_id) REFERENCES groups (group_id),
+    PRIMARY KEY (student_num, group_id),
+    is_active        boolean NOT NULL,
+    archivation_date date    NOT NULL
+);
 
 CREATE TABLE lecturers
 (
@@ -151,9 +212,16 @@ CREATE TABLE lecturers
 
 CREATE TABLE lecturers_archive
 (
+    lecturer_id           uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    lecturer_name         varchar(256) NOT NULL,
+    phone                 varchar(15)  NOT NULL,
+    email                 varchar(256) NOT NULL,
+    branch_id             int          NOT NULL,
+    FOREIGN KEY (branch_id) REFERENCES branches (branch_id),
+    comment               varchar(256),
     reason_of_archivation varchar(100) NOT NULL,
     archivation_date      date         NOT NULL
-) INHERITS (lecturers);
+);
 
 CREATE TABLE lecturers_by_group
 (
@@ -168,8 +236,15 @@ CREATE TABLE lecturers_by_group
 
 CREATE TABLE lecturers_by_group_archive
 (
+    lecturer_id   uuid    NOT NULL,
+    FOREIGN KEY (lecturer_id) REFERENCES lecturers (lecturer_id),
+    group_id      uuid    NOT NULL,
+    FOREIGN KEY (group_id) REFERENCES groups (group_id),
+    PRIMARY KEY (lecturer_id, group_id),
+    is_webinarist boolean NOT NULL,
+    is_active     boolean NOT NULL,
     archivation_date date NOT NULL
-) INHERITS (lecturers_by_group);
+);
 
 CREATE TABLE weekdays
 (
@@ -197,7 +272,12 @@ CREATE TABLE webinars_by_weekday
 
 CREATE TABLE webinars_by_weekday_archive
 (
-) INHERITS (webinars_by_weekday);
+    group_id   uuid NOT NULL,
+    FOREIGN KEY (group_id) REFERENCES groups (group_id),
+    weekday_id int  NOT NULL,
+    FOREIGN KEY (weekday_id) REFERENCES weekdays (weekday_id),
+    PRIMARY KEY (group_id, weekday_id)
+);
 
 CREATE TABLE lessons_by_weekday
 (
@@ -210,6 +290,11 @@ CREATE TABLE lessons_by_weekday
 
 CREATE TABLE lessons_by_weekday_archive
 (
-) INHERITS (lessons_by_weekday);
+    group_id   uuid NOT NULL,
+    FOREIGN KEY (group_id) REFERENCES groups (group_id),
+    weekday_id int  NOT NULL,
+    FOREIGN KEY (weekday_id) REFERENCES weekdays (weekday_id),
+    PRIMARY KEY (group_id, weekday_id)
+);
 
 
