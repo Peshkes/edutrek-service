@@ -1,6 +1,7 @@
 package com.goodquestion.edutrek_server.modules.group.controller;
 
 import com.goodquestion.edutrek_server.modules.group.dto.*;
+import com.goodquestion.edutrek_server.modules.group.persistence.groups.GroupEntity;
 import com.goodquestion.edutrek_server.modules.group.service.GroupService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,26 +21,26 @@ public class GroupController {
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public List<GroupDto> getAllGroups() {
+    public List<GroupEntity> getAllGroups() {
         return groupService.getAll();
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public GroupDto getGroupById(@PathVariable @UUID String id) {
+    public GroupEntity getGroupById(@PathVariable @UUID String id) {
         return groupService.getById(java.util.UUID.fromString(id));
     }
 
     @GetMapping("/paginated")
     @ResponseStatus(HttpStatus.OK)
-    public PaginationResponse getAllGroupsPaginated(
+    public PaginationGroupResponse getAllGroupsPaginated(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "10") int limit,
             @RequestParam(required = false) @UUID String courseId,
             @RequestParam(required = false) Boolean isActive,
             @RequestParam(required = false) String search
     ) {
-        return groupService.getAllPaginated(page, size, courseId, isActive, search);
+        return groupService.getAllPaginated(page, limit, courseId, isActive, search);
     }
 
     @PostMapping("")
@@ -61,7 +62,7 @@ public class GroupController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateGroupById(@PathVariable @UUID String id, @RequestBody @Valid UpdateGroupDto groupData) {
+    public ResponseEntity<String> updateGroupById(@PathVariable @UUID String id, @RequestBody @Valid AddGroupDto groupData) {
         groupService.updateById(java.util.UUID.fromString(id), groupData);
         return new ResponseEntity<>("Group updated", HttpStatus.OK);
     }
@@ -81,7 +82,7 @@ public class GroupController {
     @PutMapping("/archive/students/{id}")
     public ResponseEntity<String> archiveStudents(@PathVariable @UUID String id, @RequestBody @Valid List<java.util.UUID> students) {
         groupService.archiveStudents(java.util.UUID.fromString(id), students);
-        return new ResponseEntity<>("Students archived", HttpStatus.CREATED);
+        return new ResponseEntity<>("Students archived", HttpStatus.OK);
     }
 
     @PutMapping("/lecturers/{id}")

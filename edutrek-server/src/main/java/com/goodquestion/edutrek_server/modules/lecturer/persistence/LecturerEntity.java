@@ -1,6 +1,7 @@
 package com.goodquestion.edutrek_server.modules.lecturer.persistence;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,9 +12,10 @@ import java.util.UUID;
 @Table(name = "lecturers")
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class LecturerEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "lecturer_id")
     private UUID lecturerId;
     @Setter
@@ -33,10 +35,20 @@ public class LecturerEntity {
     private String comment;
 
     public LecturerEntity(String lecturerName, String phone, String email, int branchId, String comment) {
+        this.lecturerId = UUID.randomUUID();
         this.lecturerName = lecturerName;
         this.phone = phone;
         this.email = email;
         this.branchId = branchId;
         this.comment = comment;
+    }
+
+    public LecturerEntity(LecturerEntity entity) {
+        this.lecturerId = entity.getLecturerId();
+        this.lecturerName = entity.getLecturerName();
+        this.phone = entity.getPhone();
+        this.email = entity.getEmail();
+        this.branchId = entity.getBranchId();
+        this.comment = entity.getComment();
     }
 }

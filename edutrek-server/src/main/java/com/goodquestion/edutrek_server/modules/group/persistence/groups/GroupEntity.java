@@ -1,4 +1,4 @@
-package com.goodquestion.edutrek_server.modules.group.persistence;
+package com.goodquestion.edutrek_server.modules.group.persistence.groups;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,8 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GroupEntity implements IGroup{
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+public class GroupEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "group_id")
@@ -47,6 +48,7 @@ public class GroupEntity implements IGroup{
     private Boolean deactivateAfter;
 
     public GroupEntity(String groupName, LocalDate startDate, LocalDate finishDate, Boolean isActive, UUID courseId, String slackLink, String whatsAppLink, String skypeLink, Boolean deactivateAfter) {
+        this.groupId = UUID.randomUUID();
         this.groupName = groupName;
         this.startDate = startDate;
         this.finishDate = finishDate;
@@ -56,5 +58,18 @@ public class GroupEntity implements IGroup{
         this.whatsAppLink = whatsAppLink;
         this.skypeLink = skypeLink;
         this.deactivateAfter = deactivateAfter;
+    }
+
+    public GroupEntity(GroupEntity groupEntity) {
+        this.groupId = groupEntity.getGroupId();
+        this.groupName = groupEntity.getGroupName();
+        this.startDate = groupEntity.getStartDate();
+        this.finishDate = groupEntity.getFinishDate();
+        this.isActive = groupEntity.getIsActive();
+        this.courseId = groupEntity.getCourseId();
+        this.slackLink = groupEntity.getSlackLink();
+        this.whatsAppLink = groupEntity.getWhatsAppLink();
+        this.skypeLink = groupEntity.getSkypeLink();
+        this.deactivateAfter = groupEntity.getDeactivateAfter();
     }
 }

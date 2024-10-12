@@ -46,7 +46,7 @@ public class BranchService {
     }
 
     @Transactional
-    @Cacheable(key = "#id")
+    @CacheEvict(key = "#id")
     public void deleteById(int id) {
         if (!repository.existsById(id)) throw new BranchNotFoundException(String.valueOf(id));
 

@@ -1,8 +1,10 @@
 package com.goodquestion.edutrek_server.modules.lecturer.controller;
 
 import com.goodquestion.edutrek_server.modules.lecturer.dto.LecturerDataDto;
+import com.goodquestion.edutrek_server.modules.lecturer.dto.LecturerPaginationResponseDto;
 import com.goodquestion.edutrek_server.modules.lecturer.persistence.LecturerEntity;
 import com.goodquestion.edutrek_server.modules.lecturer.service.LectureService;
+import jakarta.validation.Path;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.UUID;
@@ -23,6 +25,15 @@ public class LecturerController {
     @ResponseStatus(HttpStatus.OK)
     public List<LecturerEntity> getAllLecturers() {
         return service.getAll();
+    }
+
+    @GetMapping("/paginated")
+    @ResponseStatus(HttpStatus.OK)
+    public LecturerPaginationResponseDto getAllPaginatedLecturers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        return service.getAllPaginated(page, limit);
     }
 
     @GetMapping("/{id}")
@@ -47,5 +58,11 @@ public class LecturerController {
     public ResponseEntity<String> updateLecturerById(@PathVariable @UUID String id, @RequestBody @Valid LecturerDataDto data) {
             service.updateById(java.util.UUID.fromString(id), data);
             return new ResponseEntity<>("Lecturer updated", HttpStatus.OK);
+    }
+
+    @PutMapping("/archive/{id}")
+    public ResponseEntity<String> archiveLecturerById(@PathVariable @UUID String id, @RequestBody String reason) {
+        service.archiveById(java.util.UUID.fromString(id), reason);
+        return new ResponseEntity<>("Lecturer archived", HttpStatus.OK);
     }
 }

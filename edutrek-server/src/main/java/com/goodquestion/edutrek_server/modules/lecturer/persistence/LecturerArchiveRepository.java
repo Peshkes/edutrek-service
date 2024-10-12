@@ -11,12 +11,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface LecturerRepository extends ILecturerRepository, JpaRepository<LecturerEntity, UUID>, JpaSpecificationExecutor<LecturerEntity> {
+public interface LecturerArchiveRepository extends ILecturerRepository, JpaRepository<LecturerArchiveEntity, UUID>, JpaSpecificationExecutor<LecturerArchiveEntity> {
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM ONLY lecturers WHERE lecturer_id = :id", nativeQuery = true)
+    @Query(value = "DELETE FROM ONLY lecturers_archive WHERE lecturer_id = :id", nativeQuery = true)
     int deleteLecturerById(UUID id);
 
-    @Query(value = "SELECT * FROM ONLY lecturers WHERE lecturer_id = :id", nativeQuery = true)
-    Optional<LecturerEntity> getLecturerById(UUID id);
+    @Query(value = "SELECT * FROM ONLY lecturers_archive WHERE lecturer_id = :id", nativeQuery = true)
+    Optional<LecturerArchiveEntity> getLecturerById(UUID id);
 }

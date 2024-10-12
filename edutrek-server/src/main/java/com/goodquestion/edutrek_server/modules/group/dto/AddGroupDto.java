@@ -1,11 +1,13 @@
 package com.goodquestion.edutrek_server.modules.group.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -40,4 +42,15 @@ public class AddGroupDto {
 
     @NotNull(message = "Deactivate after cannot be null")
     private Boolean deactivateAfter;
+
+    @NotNull(message = "Lessons cannot be null")
+    private List<@Min(value = 1, message = "Lessons cannot be less than 1" )
+    @Max(value = 7, message = "Lessons cannot be greater than 7" ) Integer> lessons;
+
+    @NotNull(message = "Webinars cannot be null")
+    private List<@Min(value = 1, message = "Webinars cannot be less than 1" )
+    @Max(value = 7, message = "Webinars cannot be greater than 7" ) Integer> webinars;
+
+    @NotNull(message = "Lecturers cannot be null")
+    private List<@Valid ChangeLecturersDto> lecturers;
 }

@@ -7,13 +7,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import static com.goodquestion.edutrek_server.error.ValidationErrors.*;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChangePasswordRequestDto {
-    @NotBlank(message = "Password is mandatory")
-    @Size(min = 8, message = "Password must be at least 8 characters long")
+    @NotBlank(message = PASSWORD_MANDATORY)
+    @Size(min = 8, message = PASSWORD_SIZE)
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
-            message = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character")
+            message = PASSWORD_INVALID_FORMAT)
     private String password;
 }

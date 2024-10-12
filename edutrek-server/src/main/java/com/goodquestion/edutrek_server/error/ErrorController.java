@@ -4,6 +4,7 @@ import com.goodquestion.edutrek_server.error.AuthenticationException.*;
 
 import static com.goodquestion.edutrek_server.error.ShareException.*;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,11 @@ import java.util.stream.Collectors;
 @Slf4j
 @ControllerAdvice
 public class ErrorController {
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    ResponseEntity<String> expiredJwtExceptionHandler(ExpiredJwtException e) {
+        return returnResponse(e.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
 
     @ExceptionHandler(MalformedJwtException.class)
     ResponseEntity<String> malformedJwtExceptionHandler(MalformedJwtException e) {

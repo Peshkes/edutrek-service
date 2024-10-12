@@ -6,11 +6,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import static com.goodquestion.edutrek_server.error.ValidationErrors.*;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChangeLoginRequestDto {
-    @NotBlank(message = "Login is mandatory")
-    @Size(min = 3, max = 50, message = "Login must be between 3 and 50 characters")
+    @NotBlank(message = LOGIN_MANDATORY)
+    @Size(min = 3, max = 50, message = LOGIN_SIZE)
     private String login;
 }

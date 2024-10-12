@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import static com.goodquestion.edutrek_server.error.ValidationErrors.*;
+
 @Getter
 @Setter
 @Data
@@ -14,22 +16,25 @@ import lombok.Setter;
 @NoArgsConstructor
 public class LecturerDataDto {
 
-    @NotBlank(message = "Lecturer name cannot be empty")
-    @Size(min = 2, max = 100, message = "Lecturer name must be between 2 and 100 characters")
+    @NotNull(message = NAME_MANDATORY)
+    @NotBlank(message = NAME_NOT_EMPTY)
+    @Size(min = 2, max = 100, message = NAME_SIZE)
     private String lecturerName;
 
-    @NotNull(message = "Phone number cannot be null")
+    @NotNull(message = PHONE_MANDATORY)
+    @NotBlank(message = PHONE_NOT_EMPTY)
     @Pattern(regexp = "^(?:\\+972|0)([23489]|5[0-9])-?\\d{7}$",
-            message = "Phone number must be a valid Israeli number")
+            message = PHONE_INVALID_FORMAT)
     private String phone;
 
-    @NotBlank(message = "Email cannot be empty")
-    @Email(message = "Email should be valid")
+    @NotNull(message = EMAIL_MANDATORY)
+    @NotBlank(message = EMAIL_NOT_EMPTY)
+    @Email(message = EMAIL_INVALID_FORMAT)
     private String email;
 
-    @NotNull(message = "Branch ID cannot be null")
+    @NotNull(message = BRANCH_MANDATORY)
     private int branchId;
 
-    @Size(max = 255, message = "Comment must be less than 255 characters")
+    @Size(max = 255, message = COMMENT_SIZE)
     private String comment;
 }

@@ -1,10 +1,9 @@
 package com.goodquestion.edutrek_server.modules.authentication.dto;
 
+import static com.goodquestion.edutrek_server.error.ValidationErrors.*;
+
 import com.goodquestion.edutrek_server.modules.authentication.persistence.Roles;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,16 +14,17 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddNewAccountRequestDto {
-    @NotNull(message = "Email is mandatory")
-    @NotEmpty(message = "Email cannot be empty")
-    @Email(message = "Invalid email format")
+    @NotNull(message = EMAIL_MANDATORY)
+    @NotEmpty(message = EMAIL_NOT_EMPTY)
+    @Email(message = EMAIL_INVALID_FORMAT)
     private String email;
 
-    @NotNull(message = "Name is mandatory")
-    @NotEmpty(message = "Name cannot be empty")
-    @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
+    @NotNull(message = NAME_MANDATORY)
+    @NotEmpty(message = NAME_NOT_EMPTY)
+    @Size(min = 2, max = 50, message = NAME_SIZE)
     private String name;
 
-    @NotEmpty(message = "Roles are mandatory")
-    private List<@NotNull(message = "Role cannot be null") Roles> roles;
+    @NotEmpty(message = ROLES_MANDATORY)
+    private List<@NotNull(message = ROLE_NOT_NULL) @Pattern(regexp = "^(PRINCIPAL|MANAGER)$", message = ROLE_INVALID) Roles> roles;
+
 }
