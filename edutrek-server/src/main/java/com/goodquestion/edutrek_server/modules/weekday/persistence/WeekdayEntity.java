@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "weekdays")
+@Table(schema = "current", name = "weekdays")
 @NoArgsConstructor
 public class WeekdayEntity {
     @Id

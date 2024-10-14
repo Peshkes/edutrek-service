@@ -10,14 +10,14 @@ import java.time.LocalDate;
 
 @Entity
 @Getter
-@Table(name = "groups_archive")
+@Table(schema = "archive", name = "groups")
 @NoArgsConstructor
-public class GroupArchiveEntity extends GroupEntity {
+public class GroupArchiveEntity extends BaseGroup {
 
     @Column(name = "archivation_date")
     private LocalDate archivationDate;
 
-    public GroupArchiveEntity(GroupEntity groupEntity) {
+    public GroupArchiveEntity(BaseGroup groupEntity) {
         super(groupEntity);
         this.archivationDate = LocalDate.now();
     }

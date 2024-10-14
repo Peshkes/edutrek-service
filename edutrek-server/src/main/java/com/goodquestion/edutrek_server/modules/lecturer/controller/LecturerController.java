@@ -2,9 +2,8 @@ package com.goodquestion.edutrek_server.modules.lecturer.controller;
 
 import com.goodquestion.edutrek_server.modules.lecturer.dto.LecturerDataDto;
 import com.goodquestion.edutrek_server.modules.lecturer.dto.LecturerPaginationResponseDto;
-import com.goodquestion.edutrek_server.modules.lecturer.persistence.LecturerEntity;
+import com.goodquestion.edutrek_server.modules.lecturer.persistence.BaseLecturer;
 import com.goodquestion.edutrek_server.modules.lecturer.service.LectureService;
-import jakarta.validation.Path;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.UUID;
@@ -12,20 +11,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/lecturers")
 @RequiredArgsConstructor
 public class LecturerController {
 
     private final LectureService service;
-
-    @GetMapping("")
-    @ResponseStatus(HttpStatus.OK)
-    public List<LecturerEntity> getAllLecturers() {
-        return service.getAll();
-    }
 
     @GetMapping("/paginated")
     @ResponseStatus(HttpStatus.OK)
@@ -38,7 +29,7 @@ public class LecturerController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public LecturerEntity getLecturerById(@PathVariable @UUID String id) {
+    public BaseLecturer getLecturerById(@PathVariable @UUID String id) {
             return service.getById(java.util.UUID.fromString(id));
     }
 

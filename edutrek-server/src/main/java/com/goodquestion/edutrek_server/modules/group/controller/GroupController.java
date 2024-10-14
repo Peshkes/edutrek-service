@@ -1,7 +1,9 @@
 package com.goodquestion.edutrek_server.modules.group.controller;
 
-import com.goodquestion.edutrek_server.modules.group.dto.*;
-import com.goodquestion.edutrek_server.modules.group.persistence.groups.GroupEntity;
+import com.goodquestion.edutrek_server.modules.group.dto.AddGroupDto;
+import com.goodquestion.edutrek_server.modules.group.dto.ChangeLecturersDto;
+import com.goodquestion.edutrek_server.modules.group.dto.PaginationGroupResponseDto;
+import com.goodquestion.edutrek_server.modules.group.persistence.groups.BaseGroup;
 import com.goodquestion.edutrek_server.modules.group.service.GroupService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,21 +21,15 @@ public class GroupController {
 
     private final GroupService groupService;
 
-    @GetMapping("")
-    @ResponseStatus(HttpStatus.OK)
-    public List<GroupEntity> getAllGroups() {
-        return groupService.getAll();
-    }
-
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public GroupEntity getGroupById(@PathVariable @UUID String id) {
+    public BaseGroup getGroupById(@PathVariable @UUID String id) {
         return groupService.getById(java.util.UUID.fromString(id));
     }
 
     @GetMapping("/paginated")
     @ResponseStatus(HttpStatus.OK)
-    public PaginationGroupResponse getAllGroupsPaginated(
+    public PaginationGroupResponseDto getAllGroupsPaginated(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam(required = false) @UUID String courseId,

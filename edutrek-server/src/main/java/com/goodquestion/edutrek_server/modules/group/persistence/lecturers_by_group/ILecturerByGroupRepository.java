@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.UUID;
 
-public interface ILecturerByGroupRepository<T extends LecturersByGroupEntity> extends IJunctionTableRepository, JpaRepository<T, ComposeLecturerKey> {
+public interface ILecturerByGroupRepository<T extends BaseLecturerByGroup> extends IJunctionTableRepository, JpaRepository<T, ComposeLecturerKey> {
     void deleteByGroupId(UUID groupId);
     List<T> getByGroupId(UUID uuid);
 }

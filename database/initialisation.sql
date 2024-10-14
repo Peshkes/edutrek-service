@@ -252,6 +252,7 @@ CREATE TABLE archive.groups
     start_date       date         NOT NULL,
     finish_date      date         NOT NULL,
     course_id        uuid         NOT NULL,
+    is_active        boolean      NOT NULL,
     FOREIGN KEY (course_id) REFERENCES current.courses (course_id),
     slack_link       varchar(255) NOT NULL,
     whats_app_link   varchar(255) NOT NULL,
@@ -285,9 +286,7 @@ CREATE TABLE archive.lecturers
 CREATE TABLE archive.lecturers_by_group
 (
     lecturer_id      uuid    NOT NULL,
-    FOREIGN KEY (lecturer_id) REFERENCES archive.lecturers (lecturer_id),
     group_id         uuid    NOT NULL,
-    FOREIGN KEY (group_id) REFERENCES archive.groups (group_id),
     PRIMARY KEY (lecturer_id, group_id),
     is_webinarist    boolean NOT NULL,
     is_active        boolean NOT NULL,

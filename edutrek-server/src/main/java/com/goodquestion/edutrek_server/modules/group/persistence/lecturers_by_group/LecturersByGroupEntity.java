@@ -1,8 +1,7 @@
 package com.goodquestion.edutrek_server.modules.group.persistence.lecturers_by_group;
 
-import com.goodquestion.edutrek_server.modules.group.key.ComposeLecturerKey;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,24 +9,14 @@ import java.util.UUID;
 
 @Getter
 @Entity
-@Table(name = "lecturers_by_group")
-@IdClass(ComposeLecturerKey.class)
-@AllArgsConstructor
+@Table(schema = "current", name = "lecturers_by_group")
 @NoArgsConstructor
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public class LecturersByGroupEntity {
-    @Id
-    @Column(name = "group_id")
-    private UUID groupId;
-    @Id
-    @Column(name = "lecturer_id")
-    private UUID lecturerId;
-    @Column(name = "is_webinarist")
-    private boolean isWebinarist;
+public class LecturersByGroupEntity extends BaseLecturerByGroup {
+    public LecturersByGroupEntity(BaseLecturerByGroup lecturersByGroupEntity) {
+        super(lecturersByGroupEntity);
+    }
 
-    public LecturersByGroupEntity(LecturersByGroupEntity lecturersByGroupEntity) {
-        this.groupId = lecturersByGroupEntity.getGroupId();
-        this.lecturerId = lecturersByGroupEntity.getLecturerId();
-        this.isWebinarist = lecturersByGroupEntity.isWebinarist();
+    public LecturersByGroupEntity(UUID groupId, UUID lecturerId, boolean isWebinarist) {
+        super(groupId, lecturerId, isWebinarist);
     }
 }

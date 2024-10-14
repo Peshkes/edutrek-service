@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "branches")
+@Table(schema = "current", name = "branches")
 @Getter
 @NoArgsConstructor
 public class BranchEntity {

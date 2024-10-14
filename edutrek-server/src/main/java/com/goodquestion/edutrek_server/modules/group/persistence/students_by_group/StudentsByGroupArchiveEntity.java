@@ -5,12 +5,18 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Getter
 @Entity
 @NoArgsConstructor
-@Table(name = "students_by_group_archive")
-public class StudentsByGroupArchiveEntity extends StudentsByGroupEntity {
-    public StudentsByGroupArchiveEntity(StudentsByGroupEntity studentsByGroupEntity) {
+@Table(schema = "archive", name = "students_by_group")
+public class StudentsByGroupArchiveEntity extends BaseStudentsByGroup {
+    public StudentsByGroupArchiveEntity(BaseStudentsByGroup studentsByGroupEntity) {
         super(studentsByGroupEntity);
+    }
+
+    public StudentsByGroupArchiveEntity(UUID groupId, UUID studentId, boolean isActive) {
+        super(groupId, studentId, isActive);
     }
 }
