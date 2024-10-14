@@ -1,13 +1,15 @@
 CREATE
     EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TABLE statuses
+CREATE SCHEMA IF NOT EXISTS current;
+
+CREATE TABLE current.statuses
 (
     status_id   serial PRIMARY KEY,
     status_name varchar(15) NOT NULL UNIQUE
 );
 
-INSERT INTO statuses (status_name)
+INSERT INTO current.statuses (status_name)
 VALUES ('Lead'),
        ('In work'),
        ('Consultation'),
@@ -15,139 +17,87 @@ VALUES ('Lead'),
        ('Student'),
        ('Archive');
 
-CREATE TABLE branches
+CREATE TABLE current.branches
 (
     branch_id      serial PRIMARY KEY,
-    branch_name    varchar(256) NOT NULL,
-    branch_address varchar(256) NOT NULL
+    branch_name    varchar(255) NOT NULL,
+    branch_address varchar(255) NOT NULL
 );
 
-INSERT INTO branches (branch_name, branch_address)
+INSERT INTO current.branches (branch_name, branch_address)
 VALUES ('Rehovot', 'Rehovot,Herzl st.1-25'),
        ('Haifa', 'Haifa,Herzl st.1-25'),
        ('Tel Aviv', 'Tel Aviv,Herzl st.1-25');
 
-CREATE TABLE courses
+CREATE TABLE current.courses
 (
     course_id           uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    course_name         varchar(256) NOT NULL,
+    course_name         varchar(255) NOT NULL,
     course_abbreviation varchar(8)   NOT NULL
 );
 
-INSERT INTO courses (course_name, course_abbreviation)
+INSERT INTO current.courses (course_name, course_abbreviation)
 VALUES ('Full stack development', 'FSD'),
        ('Quality assurance', 'QA'),
        ('Base Programming', 'BP');
 
-CREATE TABLE contacts
+CREATE TABLE current.contacts
 (
     contact_id       uuid PRIMARY KEY default uuid_generate_v4(),
-    contact_name     varchar(256) NOT NULL,
+    contact_name     varchar(255) NOT NULL,
     phone            varchar(15)  NOT NULL,
-    email            varchar(256) NOT NULL,
+    email            varchar(255) NOT NULL,
     status_id        int          NOT NULL,
-    FOREIGN KEY (status_id) REFERENCES statuses (status_id),
+    FOREIGN KEY (status_id) REFERENCES current.statuses (status_id),
     branch_id        int          NOT NULL,
-    FOREIGN KEY (branch_id) REFERENCES branches (branch_id),
+    FOREIGN KEY (branch_id) REFERENCES current.branches (branch_id),
     target_course_id uuid         NOT NULL,
-    FOREIGN KEY (target_course_id) REFERENCES courses (course_id),
-    comment          varchar(256)
+    FOREIGN KEY (target_course_id) REFERENCES current.courses (course_id),
+    comment          varchar(255)
 );
 
-CREATE TABLE contacts_archive
+CREATE TABLE current.students
 (
-    contact_id            uuid PRIMARY KEY default uuid_generate_v4(),
-    contact_name          varchar(256) NOT NULL,
-    phone                 varchar(15)  NOT NULL,
-    email                 varchar(256) NOT NULL,
-    status_id             int          NOT NULL,
-    FOREIGN KEY (status_id) REFERENCES statuses (status_id),
-    branch_id             int          NOT NULL,
-    FOREIGN KEY (branch_id) REFERENCES branches (branch_id),
-    target_course_id      uuid         NOT NULL,
-    FOREIGN KEY (target_course_id) REFERENCES courses (course_id),
-    comment               varchar(256),
-    reason_of_archivation varchar(100) NOT NULL,
-    archivation_date      date         NOT NULL
-);
-
-CREATE TABLE students_information
-(
-    contact_id       uuid PRIMARY KEY default uuid_generate_v4(),
-    contact_name     varchar(256) NOT NULL,
+    student_id       uuid PRIMARY KEY default uuid_generate_v4(),
+    contact_name     varchar(255) NOT NULL,
     phone            varchar(15)  NOT NULL,
-    email            varchar(256) NOT NULL,
+    email            varchar(255) NOT NULL,
     status_id        int          NOT NULL,
-    FOREIGN KEY (status_id) REFERENCES statuses (status_id),
+    FOREIGN KEY (status_id) REFERENCES current.statuses (status_id),
     branch_id        int          NOT NULL,
-    FOREIGN KEY (branch_id) REFERENCES branches (branch_id),
+    FOREIGN KEY (branch_id) REFERENCES current.branches (branch_id),
     target_course_id uuid         NOT NULL,
-    FOREIGN KEY (target_course_id) REFERENCES courses (course_id),
-    comment          varchar(256),
-    student_num      uuid UNIQUE      default uuid_generate_v4(),
+    FOREIGN KEY (target_course_id) REFERENCES current.courses (course_id),
+    comment          varchar(255),
     full_payment     int          NOT NULL,
     documents_done   boolean      NOT NULL
 );
 
-CREATE TABLE students_archive
-(
-    contact_id            uuid PRIMARY KEY default uuid_generate_v4(),
-    contact_name          varchar(256) NOT NULL,
-    phone                 varchar(15)  NOT NULL,
-    email                 varchar(256) NOT NULL,
-    status_id             int          NOT NULL,
-    FOREIGN KEY (status_id) REFERENCES statuses (status_id),
-    branch_id             int          NOT NULL,
-    FOREIGN KEY (branch_id) REFERENCES branches (branch_id),
-    target_course_id      uuid         NOT NULL,
-    FOREIGN KEY (target_course_id) REFERENCES courses (course_id),
-    comment               varchar(256),
-    student_num           uuid UNIQUE      default uuid_generate_v4(),
-    full_payment          int          NOT NULL,
-    documents_done        boolean      NOT NULL,
-    reason_of_archivation varchar(100) NOT NULL,
-    archivation_date      date         NOT NULL
-);
-
-
-
-CREATE TABLE payment_types
+CREATE TABLE current.payment_types
 (
     payment_type_id   serial PRIMARY KEY,
-    payment_type_name varchar(256) NOT NULL
+    payment_type_name varchar(255) NOT NULL
 );
 
-INSERT INTO payment_types (payment_type_name)
+INSERT INTO current.payment_types (payment_type_name)
 VALUES ('Credit card'),
        ('Cash'),
        ('Cheque'),
        ('Online transfer');
 
-CREATE TABLE payment_information
+CREATE TABLE current.payment_information
 (
     payment_id      uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    student_num     uuid,
-    FOREIGN KEY (student_num) REFERENCES students_information (student_num),
+    student_id      uuid,
+    FOREIGN KEY (student_id) REFERENCES current.students (student_id),
     payment_date    date NOT NULL,
     payment_type_id int  NOT NULL,
-    FOREIGN KEY (payment_type_id) REFERENCES payment_types (payment_type_id),
+    FOREIGN KEY (payment_type_id) REFERENCES current.payment_types (payment_type_id),
     payment_amount  int  NOT NULL,
-    payment_details varchar(256)
+    payment_details varchar(255)
 );
 
-CREATE TABLE payment_information_archive
-(
-    payment_id      uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    student_num     uuid,
-    FOREIGN KEY (student_num) REFERENCES students_information (student_num),
-    payment_date    date NOT NULL,
-    payment_type_id int  NOT NULL,
-    FOREIGN KEY (payment_type_id) REFERENCES payment_types (payment_type_id),
-    payment_amount  int  NOT NULL,
-    payment_details varchar(256)
-);
-
-CREATE TABLE groups
+CREATE TABLE current.groups
 (
     group_id         uuid PRIMARY KEY default uuid_generate_v4(),
     group_name       varchar(25)  NOT NULL,
@@ -155,104 +105,52 @@ CREATE TABLE groups
     finish_date      date         NOT NULL,
     is_active        boolean      NOT NULL,
     course_id        uuid         NOT NULL,
-    FOREIGN KEY (course_id) REFERENCES courses (course_id),
-    slack_link       varchar(256) NOT NULL,
-    whats_app_link   varchar(256) NOT NULL,
-    skype_link       varchar(256) NOT NULL,
+    FOREIGN KEY (course_id) REFERENCES current.courses (course_id),
+    slack_link       varchar(255) NOT NULL,
+    whats_app_link   varchar(255) NOT NULL,
+    skype_link       varchar(255) NOT NULL,
     deactivate_after boolean      NOT NULL
 );
 
-CREATE TABLE groups_archive
+CREATE TABLE current.students_by_group
 (
-    group_id         uuid PRIMARY KEY default uuid_generate_v4(),
-    group_name       varchar(25)  NOT NULL,
-    start_date       date         NOT NULL,
-    finish_date      date         NOT NULL,
-    is_active        boolean      NOT NULL,
-    course_id        uuid         NOT NULL,
-    FOREIGN KEY (course_id) REFERENCES courses (course_id),
-    slack_link       varchar(256) NOT NULL,
-    whats_app_link   varchar(256) NOT NULL,
-    skype_link       varchar(256) NOT NULL,
-    deactivate_after boolean      NOT NULL,
-    archivation_date date         NOT NULL
+    student_id uuid    NOT NULL,
+    FOREIGN KEY (student_id) REFERENCES current.students (student_id),
+    group_id   uuid    NOT NULL,
+    FOREIGN KEY (group_id) REFERENCES current.groups (group_id),
+    PRIMARY KEY (student_id, group_id),
+    is_active  boolean NOT NULL
 );
 
-CREATE TABLE students_by_group
-(
-    student_num uuid    NOT NULL,
-    FOREIGN KEY (student_num) REFERENCES students_information (student_num),
-    group_id    uuid    NOT NULL,
-    FOREIGN KEY (group_id) REFERENCES groups (group_id),
-    PRIMARY KEY (student_num, group_id),
-    is_active   boolean NOT NULL
-);
-
-CREATE TABLE students_by_group_archive
-(
-    student_num      uuid    NOT NULL,
-    FOREIGN KEY (student_num) REFERENCES students_information (student_num),
-    group_id         uuid    NOT NULL,
-    FOREIGN KEY (group_id) REFERENCES groups (group_id),
-    PRIMARY KEY (student_num, group_id),
-    is_active        boolean NOT NULL,
-    archivation_date date    NOT NULL
-);
-
-CREATE TABLE lecturers
+CREATE TABLE current.lecturers
 (
     lecturer_id   uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    lecturer_name varchar(256) NOT NULL,
+    lecturer_name varchar(255) NOT NULL,
     phone         varchar(15)  NOT NULL,
-    email         varchar(256) NOT NULL,
+    email         varchar(255) NOT NULL,
     branch_id     int          NOT NULL,
-    FOREIGN KEY (branch_id) REFERENCES branches (branch_id),
-    comment       varchar(256)
+    FOREIGN KEY (branch_id) REFERENCES current.branches (branch_id),
+    comment       varchar(255)
 );
 
-CREATE TABLE lecturers_archive
-(
-    lecturer_id           uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    lecturer_name         varchar(256) NOT NULL,
-    phone                 varchar(15)  NOT NULL,
-    email                 varchar(256) NOT NULL,
-    branch_id             int          NOT NULL,
-    FOREIGN KEY (branch_id) REFERENCES branches (branch_id),
-    comment               varchar(256),
-    reason_of_archivation varchar(100) NOT NULL,
-    archivation_date      date         NOT NULL
-);
-
-CREATE TABLE lecturers_by_group
+CREATE TABLE current.lecturers_by_group
 (
     lecturer_id   uuid    NOT NULL,
-    FOREIGN KEY (lecturer_id) REFERENCES lecturers (lecturer_id),
+    FOREIGN KEY (lecturer_id) REFERENCES current.lecturers (lecturer_id),
     group_id      uuid    NOT NULL,
-    FOREIGN KEY (group_id) REFERENCES groups (group_id),
+    FOREIGN KEY (group_id) REFERENCES current.groups (group_id),
     PRIMARY KEY (lecturer_id, group_id),
     is_webinarist boolean NOT NULL,
     is_active     boolean NOT NULL
 );
 
-CREATE TABLE lecturers_by_group_archive
-(
-    lecturer_id   uuid    NOT NULL,
-    FOREIGN KEY (lecturer_id) REFERENCES lecturers (lecturer_id),
-    group_id      uuid    NOT NULL,
-    FOREIGN KEY (group_id) REFERENCES groups (group_id),
-    PRIMARY KEY (lecturer_id, group_id),
-    is_webinarist boolean NOT NULL,
-    is_active     boolean NOT NULL,
-    archivation_date date NOT NULL
-);
-
-CREATE TABLE weekdays
+CREATE TABLE current.weekdays
 (
     weekday_id   serial PRIMARY KEY,
     weekday_name varchar(10) NOT NULL
 );
 
-INSERT INTO weekdays (weekday_name)
+INSERT INTO current.weekdays (weekday_name)
 VALUES ('Monday'),
        ('Tuesday'),
        ('Wednesday'),
@@ -261,40 +159,137 @@ VALUES ('Monday'),
        ('Saturday'),
        ('Sunday');
 
-CREATE TABLE webinars_by_weekday
+CREATE TABLE current.webinars_by_weekday
 (
     group_id   uuid NOT NULL,
-    FOREIGN KEY (group_id) REFERENCES groups (group_id),
+    FOREIGN KEY (group_id) REFERENCES current.groups (group_id),
     weekday_id int  NOT NULL,
-    FOREIGN KEY (weekday_id) REFERENCES weekdays (weekday_id),
+    FOREIGN KEY (weekday_id) REFERENCES current.weekdays (weekday_id),
     PRIMARY KEY (group_id, weekday_id)
 );
 
-CREATE TABLE webinars_by_weekday_archive
+CREATE TABLE current.webinars_by_weekday_archive
 (
     group_id   uuid NOT NULL,
-    FOREIGN KEY (group_id) REFERENCES groups (group_id),
+    FOREIGN KEY (group_id) REFERENCES current.groups (group_id),
     weekday_id int  NOT NULL,
-    FOREIGN KEY (weekday_id) REFERENCES weekdays (weekday_id),
+    FOREIGN KEY (weekday_id) REFERENCES current.weekdays (weekday_id),
     PRIMARY KEY (group_id, weekday_id)
 );
 
-CREATE TABLE lessons_by_weekday
+CREATE TABLE current.lessons_by_weekday
 (
     group_id   uuid NOT NULL,
-    FOREIGN KEY (group_id) REFERENCES groups (group_id),
+    FOREIGN KEY (group_id) REFERENCES current.groups (group_id),
     weekday_id int  NOT NULL,
-    FOREIGN KEY (weekday_id) REFERENCES weekdays (weekday_id),
+    FOREIGN KEY (weekday_id) REFERENCES current.weekdays (weekday_id),
     PRIMARY KEY (group_id, weekday_id)
 );
 
-CREATE TABLE lessons_by_weekday_archive
+CREATE TABLE current.lessons_by_weekday_archive
 (
     group_id   uuid NOT NULL,
-    FOREIGN KEY (group_id) REFERENCES groups (group_id),
+    FOREIGN KEY (group_id) REFERENCES current.groups (group_id),
     weekday_id int  NOT NULL,
-    FOREIGN KEY (weekday_id) REFERENCES weekdays (weekday_id),
+    FOREIGN KEY (weekday_id) REFERENCES current.weekdays (weekday_id),
     PRIMARY KEY (group_id, weekday_id)
 );
 
+CREATE SCHEMA archive;
 
+CREATE TABLE archive.contacts
+(
+    contact_id            uuid PRIMARY KEY default uuid_generate_v4(),
+    contact_name          varchar(255) NOT NULL,
+    phone                 varchar(15)  NOT NULL,
+    email                 varchar(255) NOT NULL,
+    status_id             int          NOT NULL,
+    FOREIGN KEY (status_id) REFERENCES current.statuses (status_id),
+    branch_id             int          NOT NULL,
+    FOREIGN KEY (branch_id) REFERENCES current.branches (branch_id),
+    target_course_id      uuid         NOT NULL,
+    FOREIGN KEY (target_course_id) REFERENCES current.courses (course_id),
+    comment               varchar(255),
+    reason_of_archivation varchar(100) NOT NULL,
+    archivation_date      date         NOT NULL
+);
+
+CREATE TABLE archive.students
+(
+    student_id            uuid PRIMARY KEY default uuid_generate_v4(),
+    contact_name          varchar(255) NOT NULL,
+    phone                 varchar(15)  NOT NULL,
+    email                 varchar(255) NOT NULL,
+    status_id             int          NOT NULL,
+    FOREIGN KEY (status_id) REFERENCES current.statuses (status_id),
+    branch_id             int          NOT NULL,
+    FOREIGN KEY (branch_id) REFERENCES current.branches (branch_id),
+    target_course_id      uuid         NOT NULL,
+    FOREIGN KEY (target_course_id) REFERENCES current.courses (course_id),
+    comment               varchar(255),
+    full_payment          int          NOT NULL,
+    documents_done        boolean      NOT NULL,
+    reason_of_archivation varchar(100) NOT NULL,
+    archivation_date      date         NOT NULL
+);
+
+CREATE TABLE archive.payment_information
+(
+    payment_id      uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    student_id      uuid,
+    FOREIGN KEY (student_id) REFERENCES archive.students (student_id),
+    payment_date    date NOT NULL,
+    payment_type_id int  NOT NULL,
+    FOREIGN KEY (payment_type_id) REFERENCES current.payment_types (payment_type_id),
+    payment_amount  int  NOT NULL,
+    payment_details varchar(255)
+);
+
+CREATE TABLE archive.groups
+(
+    group_id         uuid PRIMARY KEY default uuid_generate_v4(),
+    group_name       varchar(25)  NOT NULL,
+    start_date       date         NOT NULL,
+    finish_date      date         NOT NULL,
+    course_id        uuid         NOT NULL,
+    FOREIGN KEY (course_id) REFERENCES current.courses (course_id),
+    slack_link       varchar(255) NOT NULL,
+    whats_app_link   varchar(255) NOT NULL,
+    skype_link       varchar(255) NOT NULL,
+    deactivate_after boolean      NOT NULL,
+    archivation_date date         NOT NULL
+);
+
+CREATE TABLE archive.students_by_group
+(
+    student_id       uuid    NOT NULL,
+    group_id         uuid    NOT NULL,
+    PRIMARY KEY (student_id, group_id),
+    is_active        boolean NOT NULL,
+    archivation_date date    NOT NULL
+);
+
+CREATE TABLE archive.lecturers
+(
+    lecturer_id           uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    lecturer_name         varchar(255) NOT NULL,
+    phone                 varchar(15)  NOT NULL,
+    email                 varchar(255) NOT NULL,
+    branch_id             int          NOT NULL,
+    FOREIGN KEY (branch_id) REFERENCES current.branches (branch_id),
+    comment               varchar(255),
+    reason_of_archivation varchar(100) NOT NULL,
+    archivation_date      date         NOT NULL
+);
+
+CREATE TABLE archive.lecturers_by_group
+(
+    lecturer_id      uuid    NOT NULL,
+    FOREIGN KEY (lecturer_id) REFERENCES archive.lecturers (lecturer_id),
+    group_id         uuid    NOT NULL,
+    FOREIGN KEY (group_id) REFERENCES archive.groups (group_id),
+    PRIMARY KEY (lecturer_id, group_id),
+    is_webinarist    boolean NOT NULL,
+    is_active        boolean NOT NULL,
+    archivation_date date    NOT NULL
+);
