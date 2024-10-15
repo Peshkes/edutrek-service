@@ -55,11 +55,11 @@ public class LoggingAspect {
 //                joinPoint.getTarget().getClass().getSimpleName());
 //    }
 
-    @AfterThrowing(pointcut = "@annotation(Loggable)", throwing = "exception")
-    public void logAfterThrowing(JoinPoint joinPoint, Throwable exception) {
-        logger.error("Exception in method {} in {}: {}",
-                joinPoint.getSignature().getName(),
-                joinPoint.getTarget().getClass().getSimpleName(),
-                exception.getMessage());
-    }
+//    @AfterThrowing(pointcut = "@annotation(Loggable)", throwing = "exception")
+//    public void logAfterThrowing(JoinPoint joinPoint, Throwable exception) {
+//        logger.error("Exception in method {} in {}: {}",
+//                joinPoint.getSignature().getName(),
+//                joinPoint.getTarget().getClass().getSimpleName(),
+//                exception.getMessage());
+//    }
 }
