@@ -97,21 +97,9 @@ public class GroupService {
             throw new CourseNotFoundException(String.valueOf(groupData.getCourseId()));
         try {
             UUID groupId = repository.save(constructEntity(groupData)).getGroupId();
-            for (int weekdayId : groupData.getLessons()) {
-                try {
-                    lessonsByWeekdayRepository.save(new LessonsByWeekdayEntity(groupId, weekdayId));
-                } catch (Exception e) {
-                    throw new DatabaseAddingException(e.getMessage());
-                }
-            }
-            for (int weekdayId : groupData.getWebinars()) {
-                try {
-                    webinarsByWeekdayRepository.save(new WebinarsByWeekdayEntity(groupId, weekdayId));
-                } catch (Exception e) {
-                    throw new DatabaseAddingException(e.getMessage());
-                }
-            }
-            changeLecturersToGroup(groupId, groupData.getLecturers());
+            addSmthByWeekdays(groupData.getLessons(), groupId, lessonsByWeekdayRepository, LessonsByWeekdayEntity::new);
+            addSmthByWeekdays(groupData.getWebinars(), groupId, webinarsByWeekdayRepository, WebinarsByWeekdayEntity::new);
+            addLecturersToGroup(groupData.getLecturers(), groupId, lecturersByGroupRepository, LecturersByGroupEntity::new);
         } catch (Exception e) {
             throw new DatabaseAddingException(e.getMessage());
         }
@@ -155,6 +143,11 @@ public class GroupService {
     private <T extends BaseLecturerByGroup> void updateLecturersForGroup(UUID groupId, List<ChangeLecturersDto> changeLecturers,
                                                                          ILecturerByGroupRepository<T> repository, ThreeFunction<UUID, UUID, Boolean, T> entityConstructor) {
         repository.deleteByGroupId(groupId);
+        addLecturersToGroup(changeLecturers, groupId, repository, entityConstructor);
+    }
+
+    private <T extends BaseLecturerByGroup> void addLecturersToGroup(List<ChangeLecturersDto> changeLecturers, UUID groupId,
+                                                                         ILecturerByGroupRepository<T> repository, ThreeFunction<UUID, UUID, Boolean, T> entityConstructor) {
         for (ChangeLecturersDto changeLecturer : changeLecturers) {
             try {
                 T entity = entityConstructor.apply(groupId, changeLecturer.getLecturerId(), changeLecturer.getIsWebinarist());
@@ -187,13 +180,17 @@ public class GroupService {
     private <T extends BaseSmthByWeekday> void changeSmthByWeekdays(List<Integer> items, UUID groupId, ISmthByWeekday<T> repository, BiFunction<UUID, Integer, T> entityConstructor) {
         if (items != null) {
             repository.deleteByGroupId(groupId);
-            for (Integer item : items) {
-                try {
-                    T entity = entityConstructor.apply(groupId, item);
-                    repository.save(entity);
-                } catch (Exception e) {
-                    throw new DatabaseAddingException(e.getMessage());
-                }
+            addSmthByWeekdays(items, groupId, repository, entityConstructor);
+        }
+    }
+
+    private <T extends BaseSmthByWeekday> void addSmthByWeekdays(List<Integer> items, UUID groupId, ISmthByWeekday<T> repository, BiFunction<UUID, Integer, T> entityConstructor) {
+        for (Integer item : items) {
+            try {
+                T entity = entityConstructor.apply(groupId, item);
+                repository.save(entity);
+            } catch (Exception e) {
+                throw new DatabaseAddingException(e.getMessage());
             }
         }
     }
@@ -238,7 +235,7 @@ public class GroupService {
     public void archiveStudents(UUID id, List<UUID> students) {
         if (repository.existsById(id)) {
             for (UUID student : students) {
-               BaseStudentsByGroup studentsByGroup = studentsByGroupRepository.getByGroupIdAndStudentId(id, student).or(() -> studentsByGroupArchiveRepository.getByGroupIdAndStudentId(id, student)).orElseThrow(() -> new StudentNotFoundInThisGroupException(id.toString(), student.toString()));
+                BaseStudentsByGroup studentsByGroup = studentsByGroupRepository.getByGroupIdAndStudentId(id, student).or(() -> studentsByGroupArchiveRepository.getByGroupIdAndStudentId(id, student)).orElseThrow(() -> new StudentNotFoundInThisGroupException(id.toString(), student.toString()));
                 try {
                     studentsByGroup.setIsActive(false);
                 } catch (Exception e) {
