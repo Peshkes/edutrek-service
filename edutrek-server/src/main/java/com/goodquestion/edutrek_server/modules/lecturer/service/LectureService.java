@@ -64,7 +64,7 @@ public class LectureService {
     public BaseLecturer deleteById(UUID id) {
         BaseLecturer lecturer = deleteFromRepository(id, repository, lecturersByGroupRepository);
 
-        if (lecturer == null ) lecturer = deleteFromRepository(id, archiveRepository, lecturersByGroupArchiveRepository);
+        if (lecturer == null) lecturer = deleteFromRepository(id, archiveRepository, lecturersByGroupArchiveRepository);
         if (lecturer == null) throw new LecturerNotFoundException(id.toString());
 
         return lecturer;
@@ -75,13 +75,11 @@ public class LectureService {
         T entity = lecturerRepo.findById(id).orElse(null);
         if (entity != null) {
             List<U> lecturersByGroup = lecturerByGroupRepo.getByGroupId(id);
-            if (!lecturersByGroup.isEmpty()) {
-                try {
-                    lecturerByGroupRepo.deleteAll(lecturersByGroup);
-                    lecturerRepo.deleteById(id);
-                } catch (Exception e) {
-                    throw new DatabaseDeletingException(e.getMessage());
-                }
+            try {
+                if (!lecturersByGroup.isEmpty()) lecturerByGroupRepo.deleteAll(lecturersByGroup);
+                lecturerRepo.deleteById(id);
+            } catch (Exception e) {
+                throw new DatabaseDeletingException(e.getMessage());
             }
         }
         return entity;
