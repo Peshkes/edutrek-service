@@ -1,12 +1,7 @@
 package com.goodquestion.edutrek_server.modules.group.service;
 
-import com.goodquestion.edutrek_server.error.DatabaseException.DatabaseAddingException;
-import com.goodquestion.edutrek_server.error.DatabaseException.DatabaseDeletingException;
-import com.goodquestion.edutrek_server.error.DatabaseException.DatabaseUpdatingException;
-import com.goodquestion.edutrek_server.error.ShareException.CourseNotFoundException;
-import com.goodquestion.edutrek_server.error.ShareException.GroupNotFoundException;
-import com.goodquestion.edutrek_server.error.ShareException.StudentAlreadyInThisGroupException;
-import com.goodquestion.edutrek_server.error.ShareException.StudentNotFoundInThisGroupException;
+import com.goodquestion.edutrek_server.error.DatabaseException.*;
+import com.goodquestion.edutrek_server.error.ShareException.*;
 import com.goodquestion.edutrek_server.modules.course.persistence.CourseRepository;
 import com.goodquestion.edutrek_server.modules.group.dto.AddGroupDto;
 import com.goodquestion.edutrek_server.modules.group.dto.ChangeLecturersDto;
@@ -16,6 +11,7 @@ import com.goodquestion.edutrek_server.modules.group.persistence.groups.*;
 import com.goodquestion.edutrek_server.modules.group.persistence.lecturers_by_group.*;
 import com.goodquestion.edutrek_server.modules.group.persistence.lessons_and_webinars_by_weekday.*;
 import com.goodquestion.edutrek_server.modules.group.persistence.students_by_group.*;
+import com.goodquestion.edutrek_server.modules.lecturer.persistence.LecturerRepository;
 import com.goodquestion.edutrek_server.utility_service.ThreeFunction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -45,6 +41,7 @@ public class GroupService {
     private final LessonsByWeekdayRepository lessonsByWeekdayRepository;
     private final WebinarsByWeekdayRepository webinarsByWeekdayRepository;
     private final CourseRepository courseRepository;
+    private final LecturerRepository lecturerRepository;
 
     public BaseGroup getById(UUID groupId) {
         return repository.getGroupByGroupId(groupId).or(() -> archiveRepository.getGroupByGroupId(groupId)).orElseThrow(() -> new GroupNotFoundException(groupId.toString()));
@@ -78,14 +75,16 @@ public class GroupService {
             Page<GroupEntity> mainPage = repository.findAll(activeSpecification, pageable);
             List<BaseGroup> results = new ArrayList<>(mainPage.getContent());
 
+            long archiveElements = 0;
             int remainingElements = pageable.getPageSize() - results.size();
             if (remainingElements > 0) {
                 Pageable archivePageable = PageRequest.of(0, remainingElements);
                 Page<GroupArchiveEntity> archivePage = archiveRepository.findAll(archiveSpecification, archivePageable);
                 results.addAll(archivePage.getContent());
+                archiveElements = archivePage.getTotalElements();
             }
 
-            long totalElements = repository.count(activeSpecification) + archiveRepository.count(archiveSpecification);
+            long totalElements = mainPage.getTotalElements() + archiveElements;
 
             return new PaginationGroupResponseDto(results, totalElements, pageable.getPageNumber(), pageable.getPageSize());
         }
@@ -149,12 +148,15 @@ public class GroupService {
     private <T extends BaseLecturerByGroup> void addLecturersToGroup(List<ChangeLecturersDto> changeLecturers, UUID groupId,
                                                                          ILecturerByGroupRepository<T> repository, ThreeFunction<UUID, UUID, Boolean, T> entityConstructor) {
         for (ChangeLecturersDto changeLecturer : changeLecturers) {
-            try {
-                T entity = entityConstructor.apply(groupId, changeLecturer.getLecturerId(), changeLecturer.getIsWebinarist());
-                repository.save(entity);
-            } catch (Exception e) {
-                throw new DatabaseAddingException(e.getMessage());
-            }
+            if (lecturerRepository.existsById(changeLecturer.getLecturerId())){
+                try {
+                    T entity = entityConstructor.apply(groupId, changeLecturer.getLecturerId(), changeLecturer.getIsWebinarist());
+                    repository.save(entity);
+                } catch (Exception e) {
+                    throw new DatabaseAddingException(e.getMessage());
+                }
+            } else
+                throw new LecturerNotFoundException(String.valueOf(changeLecturer.getLecturerId()));
         }
     }
 
@@ -249,7 +251,7 @@ public class GroupService {
     @Transactional
     public void graduateById(UUID uuid) {
         GroupEntity groupEntity = repository.findById(uuid).orElseThrow(() -> new GroupNotFoundException(String.valueOf(uuid)));
-
+        groupEntity.setIsActive(false);
         try {
             groupEntity.setIsActive(false);
             for (StudentsByGroupEntity student : studentsByGroupRepository.getByGroupId(uuid)) {

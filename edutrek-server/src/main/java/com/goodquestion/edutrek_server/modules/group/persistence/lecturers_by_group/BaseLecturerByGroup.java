@@ -25,10 +25,20 @@ public abstract class BaseLecturerByGroup {
     private UUID lecturerId;
     @Column(name = "is_webinarist")
     private boolean isWebinarist;
+    @Column(name = "is_active")
+    private boolean isActive;
 
     public BaseLecturerByGroup(BaseLecturerByGroup baseLecturerByGroup) {
         this.groupId = baseLecturerByGroup.getGroupId();
         this.lecturerId = baseLecturerByGroup.getLecturerId();
         this.isWebinarist = baseLecturerByGroup.isWebinarist();
+        this.isActive = baseLecturerByGroup.isActive();
+    }
+
+    public BaseLecturerByGroup(UUID groupId, UUID lecturerId, boolean isWebinarist) {
+        this.groupId = groupId;
+        this.lecturerId = lecturerId;
+        this.isWebinarist = isWebinarist;
+        this.isActive = true;
     }
 }
