@@ -194,6 +194,11 @@ public class ErrorController {
         return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(PaymentInfoNotFoundException.class)
+    ResponseEntity<String> paymentInfoNotFoundException(PaymentInfoNotFoundException e) {
+        return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
     private ResponseEntity<String> returnResponse(String message, HttpStatus status) {
         log.error(message);
         return new ResponseEntity<>(message, status);

@@ -16,4 +16,5 @@ public class ShareErrors {
     static final String THIS_IS_STUDENT = "It seems that this is a student, not a contact, so you won't be able to delete it. " +
             "You'll have to delete the student. But you don't have to worry about it because the program has already done it for you :)";
     static final String LOG_NOT_FOUND = "Log not found: ";
+    static final String PAYMENT_INFORMATION_NOT_FOUND = "Payment information not found";
 }

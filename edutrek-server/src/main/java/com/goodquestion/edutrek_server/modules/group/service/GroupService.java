@@ -50,6 +50,7 @@ public class GroupService {
         return repository.getGroupByGroupId(groupId).or(() -> archiveRepository.getGroupByGroupId(groupId)).orElseThrow(() -> new GroupNotFoundException(groupId.toString()));
     }
 
+    @SuppressWarnings("unchecked")
     public PaginationGroupResponseDto getAllPaginated(int page, int size, String courseId, Boolean isActive, String search) {
         Pageable pageable = PageRequest.of(page, size);
 
@@ -118,9 +119,9 @@ public class GroupService {
 
     @Transactional
     public void deleteById(UUID groupId) {
-        if (repository.checkGroupExistsById(groupId)) {
+        if (repository.existsById(groupId)) {
             deleteGroupData(groupId, repository, lecturersByGroupRepository, studentsByGroupRepository);
-        } else if (archiveRepository.checkGroupExistsById(groupId)) {
+        } else if (archiveRepository.existsById(groupId)) {
             deleteGroupData(groupId, archiveRepository, lecturersByGroupArchiveRepository, studentsByGroupArchiveRepository);
         } else {
             throw new GroupNotFoundException(String.valueOf(groupId));
@@ -142,9 +143,9 @@ public class GroupService {
 
     @Transactional
     public void changeLecturersToGroup(UUID uuid, List<ChangeLecturersDto> changeLecturers) {
-        if (repository.checkGroupExistsById(uuid)) {
+        if (repository.existsById(uuid)) {
             updateLecturersForGroup(uuid, changeLecturers, lecturersByGroupRepository, LecturersByGroupEntity::new);
-        } else if (archiveRepository.checkGroupExistsById(uuid)) {
+        } else if (archiveRepository.existsById(uuid)) {
             updateLecturersForGroup(uuid, changeLecturers, lecturersByGroupArchiveRepository, LecturersByGroupArchiveEntity::new);
         } else {
             throw new GroupNotFoundException(String.valueOf(uuid));

@@ -4,13 +4,16 @@ import com.goodquestion.edutrek_server.error.DatabaseException.*;
 
 import static com.goodquestion.edutrek_server.error.ShareException.*;
 
-import com.goodquestion.edutrek_server.modules.contacts.archive.*;
 import com.goodquestion.edutrek_server.modules.contacts.dto.*;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.*;
+import com.goodquestion.edutrek_server.modules.contacts.persistence.archive.ContactArchiveEntity;
+import com.goodquestion.edutrek_server.modules.contacts.persistence.archive.ContactsArchiveRepository;
+import com.goodquestion.edutrek_server.modules.contacts.persistence.current.ContactsEntity;
+import com.goodquestion.edutrek_server.modules.contacts.persistence.current.ContactsRepository;
 import com.goodquestion.edutrek_server.modules.statuses.persistence.StatusRepository;
-import com.goodquestion.edutrek_server.modules.studentInformation.dto.StudentsInfoDataDto;
-import com.goodquestion.edutrek_server.modules.studentInformation.persistence.StudentInfoEntity;
-import com.goodquestion.edutrek_server.modules.studentInformation.persistence.StudentsInfoRepository;
+import com.goodquestion.edutrek_server.modules.students.dto.StudentsDataDto;
+import com.goodquestion.edutrek_server.modules.students.persistence.current.StudentEntity;
+import com.goodquestion.edutrek_server.modules.students.persistence.current.StudentsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
@@ -19,8 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDate;
-
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -30,25 +32,23 @@ public class ContactsService {
 
     private final ContactsArchiveRepository archiveRepository;
     private final ContactsRepository contactRepository;
-    private final StudentsInfoRepository studentRepository;
+    private final StudentsRepository studentRepository;
     private final StatusRepository statusRepository;
-
     private final RestTemplate restTemplate;
 
-
+    @SuppressWarnings("unchecked")
     public ContactSearchDto getAll(int page, int pageSize, String search, Integer statusId) {
         Pageable pageable = PageRequest.of(page, pageSize);
-        Specification<ContactsEntity> specs = Specification.where(null);
-        if (statusId != null)
-            specs = specs.and(ContactsFilterSpecifications.hasStatusId(statusId));
-        if (search != null && !search.isEmpty() && !search.isBlank()) {
-            specs = specs.and(ContactsFilterSpecifications.hasName(search))
-                    .or(ContactsFilterSpecifications.hasPhone(search))
-                    .or(ContactsFilterSpecifications.hasEmail(search));
-        }
-        Page<ContactsEntity> pageEntity = contactRepository.findAll(specs, pageable);
-        return new ContactSearchDto(pageEntity.getContent(), page, pageSize, pageEntity.getTotalElements());
+        Specification<ContactsEntity> contactSpecs = new ContactsFilterSpecifications<ContactsEntity>().getSpecifications(search,statusId);
+        Specification<ContactArchiveEntity> contactArchiveSpecs = new ContactsFilterSpecifications<ContactArchiveEntity>().getSpecifications(search,statusId);
+        Page<? extends AbstractContacts> pageCurrentEntity = contactRepository.findAll(contactSpecs, pageable);
+        Page<? extends AbstractContacts> pageArchiveEntity = archiveRepository.findAll(contactArchiveSpecs,pageable);
+        List<AbstractContacts> foundCurrent = (List<AbstractContacts>) pageCurrentEntity.getContent();
+        List<AbstractContacts> foundArchive = (List<AbstractContacts>) pageArchiveEntity.getContent();
+        foundCurrent.addAll(foundArchive);
+        return new ContactSearchDto(foundCurrent, page, pageSize, (pageCurrentEntity.getTotalElements() + pageArchiveEntity.getTotalElements()));
     }
+
 
     public ContactsEntity getById(UUID id) {
         return contactRepository.findById(id).orElseThrow(() -> new ContactNotFoundException(id.toString()));
@@ -118,46 +118,38 @@ public class ContactsService {
 
     @Transactional
     public void moveContactToArchiveById(UUID id, String reason) {
-        if (archiveRepository.existsById(id))
-            throw new ContactAlreadyArchivedException(id.toString());
         ContactsEntity contact = contactRepository.findById(id).orElseThrow(() -> new ContactNotFoundException(id.toString()));
         int statusId = statusRepository.getStatusEntityByStatusName("Archive").getStatusId();
         contact.setStatusId(statusId);
+        ContactArchiveEntity contactArchEntity = new ContactArchiveEntity(contact,reason);
         try {
-            archiveRepository.save(new ContactArchiveDocument(id, contact.getContactName(), contact.getPhone(), contact.getEmail(), contact.getStatusId(), contact.getBranchId(), contact.getTargetCourseId(), reason, LocalDate.now()));
-        } catch (Exception e) {
-            throw new DatabaseAddingException(e.getMessage());
-        }
-        try {
-            contactRepository.deleteById(id);
+            contactRepository.deleteContactById(id);
         } catch (Exception e) {
             throw new DatabaseDeletingException(e.getMessage());
+        }
+        try {
+            archiveRepository.save(contactArchEntity);
+        } catch (Exception e) {
+            throw new DatabaseAddingException(e.getMessage());
         }
     }
 
     @Transactional
-    public void promoteContactToStudentById(UUID id, StudentsInfoDataDto studentData) {
+    public void promoteContactToStudentById(UUID id, StudentsDataDto studentData) {
         ContactsEntity contact = contactRepository.findById(id).orElseThrow(() -> new ContactNotFoundException(id.toString()));
         if (!studentRepository.existsById(id)) {
             int statusId = statusRepository.getStatusEntityByStatusName("Student").getStatusId();
             contact.setStatusId(statusId);
             try {
-                studentRepository.save(new StudentInfoEntity(
-                        id,
-                        contact.getContactName(),
-                        contact.getPhone(),
-                        contact.getEmail(),
-                        statusId,
-                        contact.getBranchId(),
-                        contact.getTargetCourseId(),
-                        contact.getComment(),
-                        studentData.getFullPayment(),
-                        studentData.isDocumentsDone()));
+                studentRepository.save(new StudentEntity(studentData));
             } catch (Exception e) {
                 throw new DatabaseAddingException(e.getMessage());
             }
+            try {
+                contactRepository.deleteById(id);
+            } catch (Exception e) {
+                throw new DatabaseDeletingException(e.getMessage());
+            }
         }
-
     }
-
 }

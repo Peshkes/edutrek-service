@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "statuses")
+@Table(schema = "current", name = "statuses")
 @Getter
 @NoArgsConstructor
 public class StatusEntity {

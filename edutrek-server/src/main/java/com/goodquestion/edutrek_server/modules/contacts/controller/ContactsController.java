@@ -3,9 +3,9 @@ package com.goodquestion.edutrek_server.modules.contacts.controller;
 
 import com.goodquestion.edutrek_server.modules.contacts.dto.ContactSearchDto;
 import com.goodquestion.edutrek_server.modules.contacts.dto.ContactsDataDto;
-import com.goodquestion.edutrek_server.modules.contacts.persistence.ContactsEntity;
+import com.goodquestion.edutrek_server.modules.contacts.persistence.current.ContactsEntity;
 import com.goodquestion.edutrek_server.modules.contacts.service.ContactsService;
-import com.goodquestion.edutrek_server.modules.studentInformation.dto.StudentsInfoDataDto;
+import com.goodquestion.edutrek_server.modules.students.dto.StudentsDataDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -70,7 +70,7 @@ public class ContactsController {
     }
 
     @PostMapping("/promote/{id}")
-    public ResponseEntity<String> promoteContactToStudentById(@PathVariable UUID id,@RequestBody @Valid StudentsInfoDataDto studentData) {
+    public ResponseEntity<String> promoteContactToStudentById(@PathVariable UUID id,@RequestBody @Valid StudentsDataDto studentData) {
         contactsService.promoteContactToStudentById(id,studentData);
         return new ResponseEntity<>("Contact promoted to student", HttpStatus.OK);
     }

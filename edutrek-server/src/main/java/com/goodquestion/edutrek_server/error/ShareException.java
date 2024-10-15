@@ -92,4 +92,10 @@ public class ShareException extends RuntimeException {
             super(CONTACT_ALREADY_EXISTS_IN_ARCHIVE + message);
         }
     }
+
+    public static class PaymentInfoNotFoundException extends ShareException {
+        public PaymentInfoNotFoundException(String message) {
+            super(PAYMENT_INFORMATION_NOT_FOUND + message);
+        }
+    }
 }

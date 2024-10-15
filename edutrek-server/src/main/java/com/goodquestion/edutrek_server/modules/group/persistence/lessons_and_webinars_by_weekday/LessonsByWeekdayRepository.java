@@ -5,7 +5,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.UUID;
 
-public interface LessonsByWeekdayRepository extends ISmthByWeekday<LessonsByWeekdayEntity>{
+public interface LessonsByWeekdayRepository extends ISmthByWeekday<LessonsByWeekdayEntity> {
     void deleteByGroupId(@Param("id") UUID groupId);
     List<LessonsByWeekdayEntity>  getByGroupId(@Param("id") UUID uuid);
 }

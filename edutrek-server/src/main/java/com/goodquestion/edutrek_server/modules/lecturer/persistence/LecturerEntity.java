@@ -13,4 +13,5 @@ public class LecturerEntity extends BaseLecturer {
     public LecturerEntity(String lecturerName, String phone, String email, int branchId, String comment) {
         super(lecturerName, phone, email, branchId, comment);
     }
+
 }

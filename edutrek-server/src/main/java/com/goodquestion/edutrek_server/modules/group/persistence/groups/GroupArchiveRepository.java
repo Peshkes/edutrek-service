@@ -11,10 +11,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface GroupArchiveRepository extends IGroupRepository<GroupArchiveEntity>{
+public interface GroupArchiveRepository extends IGroupRepository<GroupArchiveEntity> {
     @Modifying
     void deleteGroupByGroupId(UUID id);
     Optional<BaseGroup> getGroupByGroupId(@Param("id") UUID id);
     Page<GroupArchiveEntity> findAll(Specification<GroupArchiveEntity> spec, Pageable pageable);
-    boolean checkGroupExistsById(@Param("id") UUID id);
+
 }
