@@ -13,6 +13,7 @@ import com.goodquestion.edutrek_server.modules.group.persistence.lessons_and_web
 import com.goodquestion.edutrek_server.modules.group.persistence.students_by_group.*;
 import com.goodquestion.edutrek_server.modules.lecturer.persistence.LecturerRepository;
 import com.goodquestion.edutrek_server.utility_service.ThreeFunction;
+import com.goodquestion.edutrek_server.utility_service.logging.Loggable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,10 +44,12 @@ public class GroupService {
     private final CourseRepository courseRepository;
     private final LecturerRepository lecturerRepository;
 
+    @Loggable
     public BaseGroup getById(UUID groupId) {
         return repository.getGroupByGroupId(groupId).or(() -> archiveRepository.getGroupByGroupId(groupId)).orElseThrow(() -> new GroupNotFoundException(groupId.toString()));
     }
 
+    @Loggable
     @SuppressWarnings("unchecked")
     public PaginationGroupResponseDto getAllPaginated(int page, int size, String courseId, Boolean isActive, String search) {
         Pageable pageable = PageRequest.of(page, size);
@@ -90,6 +93,7 @@ public class GroupService {
         }
     }
 
+    @Loggable
     @Transactional
     public void addEntity(AddGroupDto groupData) {
         if (!courseRepository.existsById(groupData.getCourseId()))
@@ -104,6 +108,7 @@ public class GroupService {
         }
     }
 
+    @Loggable
     @Transactional
     public void deleteById(UUID groupId) {
         if (repository.existsById(groupId)) {
@@ -128,6 +133,7 @@ public class GroupService {
         }
     }
 
+    @Loggable
     @Transactional
     public void changeLecturersToGroup(UUID uuid, List<ChangeLecturersDto> changeLecturers) {
         if (repository.existsById(uuid)) {
@@ -160,6 +166,7 @@ public class GroupService {
         }
     }
 
+    @Loggable
     @Transactional
     public void updateById(UUID groupId, AddGroupDto groupData) {
         GroupEntity groupEntity = repository.findById(groupId).orElseThrow(() -> new GroupNotFoundException(groupId.toString()));
@@ -197,6 +204,7 @@ public class GroupService {
         }
     }
 
+    @Loggable
     public void addStudentsToGroup(UUID uuid, List<UUID> students) {
         if (repository.existsById(uuid)) {
             for (UUID student : students) {
@@ -211,6 +219,7 @@ public class GroupService {
             throw new GroupNotFoundException(String.valueOf(uuid));
     }
 
+    @Loggable
     @Transactional
     public void moveStudentsBetweenGroups(UUID fromId, UUID toId, List<UUID> students) {
         if (repository.existsById(fromId)) {
@@ -233,6 +242,7 @@ public class GroupService {
             throw new GroupNotFoundException(String.valueOf(fromId));
     }
 
+    @Loggable
     @Transactional
     public void archiveStudents(UUID id, List<UUID> students) {
         if (repository.existsById(id)) {
@@ -248,6 +258,7 @@ public class GroupService {
             throw new GroupNotFoundException(String.valueOf(id));
     }
 
+    @Loggable
     @Transactional
     public void graduateById(UUID uuid) {
         GroupEntity groupEntity = repository.findById(uuid).orElseThrow(() -> new GroupNotFoundException(String.valueOf(uuid)));
@@ -275,6 +286,7 @@ public class GroupService {
         }
     }
 
+    @Loggable
     @Transactional
     @Scheduled(fixedRate = 86400000)
     public void checkGraduation() {

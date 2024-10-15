@@ -3,6 +3,7 @@ package com.goodquestion.edutrek_server.modules.log.service;
 import com.goodquestion.edutrek_server.error.ShareException;
 import com.goodquestion.edutrek_server.modules.log.persistence.LogDocument;
 import com.goodquestion.edutrek_server.modules.log.persistence.LogRepository;
+import com.goodquestion.edutrek_server.utility_service.logging.Loggable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ public class LogService {
 
     private final LogRepository repository;
 
+    @Loggable
     public void add(UUID id, String log) {
         LogDocument document = repository.findById(id)
                 .orElse(new LogDocument(id));
@@ -26,6 +28,7 @@ public class LogService {
         repository.save(document);
     }
 
+    @Loggable
     public List<String> getById(UUID uuid) {
         return repository.findById(uuid)
                 .orElseThrow(() -> new ShareException.LogNotFoundException(uuid.toString()))

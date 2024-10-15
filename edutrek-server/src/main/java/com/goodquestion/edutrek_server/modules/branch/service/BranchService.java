@@ -7,6 +7,7 @@ import com.goodquestion.edutrek_server.error.ShareException.BranchNotFoundExcept
 import com.goodquestion.edutrek_server.modules.branch.dto.BranchDataDto;
 import com.goodquestion.edutrek_server.modules.branch.persistence.BranchEntity;
 import com.goodquestion.edutrek_server.modules.branch.persistence.BranchRepository;
+import com.goodquestion.edutrek_server.utility_service.logging.Loggable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -25,16 +26,19 @@ public class BranchService {
 
     private final BranchRepository repository;
 
+    @Loggable
     @Cacheable(key = "#root.methodName")
     public List<BranchEntity> getAll() {
         return repository.findAll();
     }
 
+    @Loggable
     @Cacheable(key = "#id")
     public BranchEntity getById(int id) {
         return repository.findById(id).orElseThrow(() -> new BranchNotFoundException(String.valueOf(id)));
     }
 
+    @Loggable
     @CacheEvict(key = "{'getALl'}")
     @Transactional
     public void addEntity(BranchDataDto branchData) {
@@ -45,6 +49,7 @@ public class BranchService {
         }
     }
 
+    @Loggable
     @Transactional
     @CacheEvict(key = "#id")
     public void deleteById(int id) {
@@ -57,6 +62,7 @@ public class BranchService {
         }
     }
 
+    @Loggable
     @Transactional
     @CachePut(key = "#id")
     public void updateById(int id, BranchDataDto branchData) {

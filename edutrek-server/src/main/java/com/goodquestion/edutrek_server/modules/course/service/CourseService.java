@@ -7,6 +7,7 @@ import com.goodquestion.edutrek_server.error.ShareException;
 import com.goodquestion.edutrek_server.modules.course.dto.CourseDataDto;
 import com.goodquestion.edutrek_server.modules.course.persistence.CourseEntity;
 import com.goodquestion.edutrek_server.modules.course.persistence.CourseRepository;
+import com.goodquestion.edutrek_server.utility_service.logging.Loggable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -25,15 +26,18 @@ public class CourseService {
 
     private final CourseRepository repository;
 
+    @Loggable
     @Cacheable(key = "#root.methodName")
     public List<CourseEntity> getAll() {
         return repository.findAll();
     }
 
+    @Loggable
     public CourseEntity getById(UUID courseId) {
         return repository.findById(courseId).orElseThrow(() -> new ShareException.CourseNotFoundException(String.valueOf(courseId)));
     }
 
+    @Loggable
     @Transactional
     @CacheEvict(key = "{'getAll'}")
     public void addEntity(CourseDataDto courseData) {
@@ -44,6 +48,7 @@ public class CourseService {
         }
     }
 
+    @Loggable
     @Transactional
     @CachePut(key = "#id")
     public void deleteById(UUID id) {
@@ -57,6 +62,7 @@ public class CourseService {
         }
     }
 
+    @Loggable
     @Transactional
     @CachePut(key = "#id")
     public void updateById(UUID id, CourseDataDto courseData) {
