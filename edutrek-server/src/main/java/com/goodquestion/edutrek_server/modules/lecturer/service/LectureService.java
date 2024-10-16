@@ -10,6 +10,7 @@ import com.goodquestion.edutrek_server.modules.group.persistence.lecturers_by_gr
 import com.goodquestion.edutrek_server.modules.lecturer.dto.LecturerDataDto;
 import com.goodquestion.edutrek_server.modules.lecturer.dto.LecturerPaginationResponseDto;
 import com.goodquestion.edutrek_server.modules.lecturer.persistence.*;
+import com.goodquestion.edutrek_server.utility_service.logging.Loggable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,10 +31,12 @@ public class LectureService {
     private final LecturersByGroupRepository lecturersByGroupRepository;
     private final LecturersByGroupArchiveRepository lecturersByGroupArchiveRepository;
 
+    @Loggable
     public BaseLecturer getById(UUID id) {
         return repository.getLecturerByLecturerId(id).or(() -> archiveRepository.getLecturerByLecturerId(id)).orElseThrow(() -> new LecturerNotFoundException(id.toString()));
     }
 
+    @Loggable
     public LecturerPaginationResponseDto getAllPaginated(int page, int limit) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<LecturerEntity> mainPage = repository.findAll(pageable);
@@ -51,6 +54,7 @@ public class LectureService {
         return new LecturerPaginationResponseDto(results, totalElements, pageable.getPageNumber(), pageable.getPageSize());
     }
 
+    @Loggable
     @Transactional
     public void addEntity(LecturerDataDto data) {
         try {
@@ -60,11 +64,12 @@ public class LectureService {
         }
     }
 
+    @Loggable
     @Transactional
     public BaseLecturer deleteById(UUID id) {
         BaseLecturer lecturer = deleteFromRepository(id, repository, lecturersByGroupRepository);
 
-        if (lecturer == null ) lecturer = deleteFromRepository(id, archiveRepository, lecturersByGroupArchiveRepository);
+        if (lecturer == null) lecturer = deleteFromRepository(id, archiveRepository, lecturersByGroupArchiveRepository);
         if (lecturer == null) throw new LecturerNotFoundException(id.toString());
 
         return lecturer;
@@ -75,18 +80,17 @@ public class LectureService {
         T entity = lecturerRepo.findById(id).orElse(null);
         if (entity != null) {
             List<U> lecturersByGroup = lecturerByGroupRepo.getByGroupId(id);
-            if (!lecturersByGroup.isEmpty()) {
-                try {
-                    lecturerByGroupRepo.deleteAll(lecturersByGroup);
-                    lecturerRepo.deleteById(id);
-                } catch (Exception e) {
-                    throw new DatabaseDeletingException(e.getMessage());
-                }
+            try {
+                if (!lecturersByGroup.isEmpty()) lecturerByGroupRepo.deleteAll(lecturersByGroup);
+                lecturerRepo.deleteById(id);
+            } catch (Exception e) {
+                throw new DatabaseDeletingException(e.getMessage());
             }
         }
         return entity;
     }
 
+    @Loggable
     @Transactional
     public void updateById(UUID id, LecturerDataDto data) {
         BaseLecturer entity = repository.getLecturerByLecturerId(id).or(() -> archiveRepository.getLecturerByLecturerId(id)).orElseThrow(() -> new LecturerNotFoundException(id.toString()));
@@ -97,7 +101,7 @@ public class LectureService {
         entity.setComment(data.getComment());
     }
 
-
+    @Loggable
     @Transactional
     public void archiveById(UUID uuid, String reason) {
         if (repository.existsById(uuid)) {

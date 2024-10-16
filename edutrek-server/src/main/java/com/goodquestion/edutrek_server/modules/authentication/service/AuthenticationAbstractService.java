@@ -9,6 +9,7 @@ import com.goodquestion.edutrek_server.modules.authentication.dto.*;
 import com.goodquestion.edutrek_server.modules.authentication.persistence.AccountDocument;
 import com.goodquestion.edutrek_server.modules.authentication.persistence.AccountRepository;
 import com.goodquestion.edutrek_server.utility_service.EmailService;
+import com.goodquestion.edutrek_server.utility_service.logging.Loggable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,16 +33,19 @@ public abstract class AuthenticationAbstractService {
 
     public abstract AuthenticationResultDto signIn(AuthenticationDataDto authenticationDataDto);
 
+    @Loggable
     public PublicAccountDataDto getAccountById(UUID id) {
         AccountDocument accountDocument = accountRepository.findById(id).orElseThrow(() -> new AuthenticationException.UserNotFoundException(id));
         return new PublicAccountDataDto(accountDocument.getAccountId(), accountDocument.getEmail(), accountDocument.getLogin(), accountDocument.getName(), accountDocument.getRoles());
     }
 
+    @Loggable
     public PublicAccountDataDto getAccountByLogin(String login) {
         AccountDocument accountDocument = accountRepository.findAccountDocumentByLogin(login).orElseThrow(() -> new UsernameNotFoundException(login));
         return new PublicAccountDataDto(accountDocument.getAccountId(), accountDocument.getEmail(), accountDocument.getLogin(), accountDocument.getName(), accountDocument.getRoles());
     }
 
+    @Loggable
     public List<PublicAccountDataDto> getAllAccounts() {
         List<AccountDocument> accountDocuments = accountRepository.findAll();
         if (accountDocuments.isEmpty())
@@ -50,6 +54,7 @@ public abstract class AuthenticationAbstractService {
             return accountDocuments.stream().map(accountDocument -> new PublicAccountDataDto(accountDocument.getAccountId(), accountDocument.getEmail(), accountDocument.getLogin(), accountDocument.getName(), accountDocument.getRoles())).collect(Collectors.toList());
     }
 
+    @Loggable
     @Transactional
     public void addNewAccount(AddNewAccountRequestDto addNewAccountRequestDto) {
         String email = addNewAccountRequestDto.getEmail();
@@ -68,6 +73,7 @@ public abstract class AuthenticationAbstractService {
         }
     }
 
+    @Loggable
     @Transactional
     public AccountDocument deleteAccount(UUID id) {
         if (!accountRepository.existsAccountDocumentByAccountId(id))
@@ -79,6 +85,7 @@ public abstract class AuthenticationAbstractService {
         }
     }
 
+    @Loggable
     @Transactional
     public void changePassword(UUID id, ChangePasswordRequestDto changePasswordRequest) {
         AccountDocument accountDocument = accountRepository.findById(id).orElseThrow(() -> new AuthenticationException.UserNotFoundException(id));
@@ -114,6 +121,7 @@ public abstract class AuthenticationAbstractService {
         }
     }
 
+    @Loggable
     public void changeLogin(UUID id, ChangeLoginRequestDto changeLoginRequest) {
         AccountDocument accountDocument = accountRepository.findById(id).orElseThrow(() -> new AuthenticationException.UserNotFoundException(id));
 
@@ -129,6 +137,7 @@ public abstract class AuthenticationAbstractService {
             throw new AuthenticationException.LoginAlreadyExistsException(login);
     }
 
+    @Loggable
     public String rollback(AccountDocument accountDocument) {
         try {
             accountRepository.save(accountDocument);

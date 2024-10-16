@@ -10,6 +10,7 @@ import com.goodquestion.edutrek_server.modules.authentication.dto.Authentication
 import com.goodquestion.edutrek_server.modules.authentication.persistence.AccountRepository;
 import com.goodquestion.edutrek_server.utility_service.EmailService;
 import com.goodquestion.edutrek_server.utility_service.JwtService;
+import com.goodquestion.edutrek_server.utility_service.logging.Loggable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ public class AuthenticationJWTService extends AuthenticationAbstractService {
         this.userConfig = userConfig;
     }
 
+    @Loggable
     @Transactional
     public AuthenticationResultDto signIn(AuthenticationDataDto authenticationDataDto) {
         String username = authenticationDataDto.getLogin();
@@ -41,6 +43,7 @@ public class AuthenticationJWTService extends AuthenticationAbstractService {
             throw new UsernameNotFoundException(username);
     }
 
+    @Loggable
     public AuthenticationResultDto refreshToken(String refreshToken) {
         if (refreshToken != null) {
             String username = jwtService.getUsername(refreshToken);

@@ -1,5 +1,6 @@
 package com.goodquestion.edutrek_server.utility_service;
 
+import com.goodquestion.edutrek_server.utility_service.logging.Loggable;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -35,17 +36,20 @@ public class EmailService {
         return helper;
     }
 
+    @Loggable
     public void sendEmail(String toEmail, String subject, String body) throws MessagingException {
         MimeMessageHelper helper = createMimeMessageHelper(toEmail, subject, body, false);
         mailSender.send(helper.getMimeMessage());
     }
 
+    @Loggable
     public void sendEmailWithAttachment(String toEmail, String subject, String body, byte[] attachmentData, String attachmentName) throws MessagingException {
         MimeMessageHelper helper = createMimeMessageHelper(toEmail, subject, body, true);
         helper.addAttachment(attachmentName, new ByteArrayResource(attachmentData));
         mailSender.send(helper.getMimeMessage());
     }
 
+    @Loggable
     public void sendRegistrationEmail(String toEmail, String login, String password) throws MessagingException, IOException {
         ClassPathResource resource = new ClassPathResource("registration.webp");
         byte[] imageBytes = Files.readAllBytes(resource.getFile().toPath());
