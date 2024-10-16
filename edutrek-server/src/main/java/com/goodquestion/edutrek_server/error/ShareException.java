@@ -93,6 +93,12 @@ public class ShareException extends RuntimeException {
         }
     }
 
+    public static class ContactNotFoundInArchiveAndCurrentException extends ShareException {
+        public ContactNotFoundInArchiveAndCurrentException(String message) {
+            super(CONTACT_NOT_FOUND_IN_CURRENT_AND_IN_ARCHIVE + message);
+        }
+    }
+
     public static class PaymentInfoNotFoundException extends ShareException {
         public PaymentInfoNotFoundException(String message) {
             super(PAYMENT_INFORMATION_NOT_FOUND + message);

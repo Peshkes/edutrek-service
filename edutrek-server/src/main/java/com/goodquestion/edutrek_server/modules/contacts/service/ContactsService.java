@@ -10,6 +10,7 @@ import com.goodquestion.edutrek_server.modules.contacts.persistence.archive.Cont
 import com.goodquestion.edutrek_server.modules.contacts.persistence.archive.ContactsArchiveRepository;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.current.ContactsEntity;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.current.ContactsRepository;
+import com.goodquestion.edutrek_server.modules.statuses.persistence.StatusEntity;
 import com.goodquestion.edutrek_server.modules.statuses.persistence.StatusRepository;
 import com.goodquestion.edutrek_server.modules.students.dto.StudentsDataDto;
 import com.goodquestion.edutrek_server.modules.students.persistence.current.StudentEntity;
@@ -38,15 +39,35 @@ public class ContactsService {
 
     @SuppressWarnings("unchecked")
     public ContactSearchDto getAll(int page, int pageSize, String search, Integer statusId) {
+        StatusEntity status = statusId == null ? null : statusRepository.findById(statusId).orElse(null);
         Pageable pageable = PageRequest.of(page, pageSize);
-        Specification<ContactsEntity> contactSpecs = new ContactsFilterSpecifications<ContactsEntity>().getSpecifications(search,statusId);
-        Specification<ContactArchiveEntity> contactArchiveSpecs = new ContactsFilterSpecifications<ContactArchiveEntity>().getSpecifications(search,statusId);
-        Page<? extends AbstractContacts> pageCurrentEntity = contactRepository.findAll(contactSpecs, pageable);
-        Page<? extends AbstractContacts> pageArchiveEntity = archiveRepository.findAll(contactArchiveSpecs,pageable);
-        List<AbstractContacts> foundCurrent = (List<AbstractContacts>) pageCurrentEntity.getContent();
-        List<AbstractContacts> foundArchive = (List<AbstractContacts>) pageArchiveEntity.getContent();
-        foundCurrent.addAll(foundArchive);
-        return new ContactSearchDto(foundCurrent, page, pageSize, (pageCurrentEntity.getTotalElements() + pageArchiveEntity.getTotalElements()));
+        if (status != null && status.getStatusName().equals("Archive")) {
+            Specification<ContactArchiveEntity> contactArchiveSpecs = new ContactsFilterSpecifications<ContactArchiveEntity>().getSpecifications(search, statusId);
+            Page<? extends AbstractContacts> pageArchiveEntity = archiveRepository.findAll(contactArchiveSpecs, pageable);
+            List<AbstractContacts> foundArchive = (List<AbstractContacts>) pageArchiveEntity.getContent();
+            return new ContactSearchDto(foundArchive, page, pageSize, pageArchiveEntity.getTotalElements());
+        } else {
+            Specification<ContactsEntity> contactSpecs = new ContactsFilterSpecifications<ContactsEntity>().getSpecifications(search, statusId);
+            Page<? extends AbstractContacts> pageCurrentEntity = contactRepository.findAll(contactSpecs, pageable);
+            List<AbstractContacts> foundCurrent = (List<AbstractContacts>) pageCurrentEntity.getContent();
+            int count = 0;
+            if (foundCurrent.size() < pageSize) {
+                Specification<ContactArchiveEntity> contactArchiveSpecs = new ContactsFilterSpecifications<ContactArchiveEntity>().getSpecifications(search, statusId);
+                Page<? extends AbstractContacts> pageArchiveEntity = archiveRepository.findAll(contactArchiveSpecs, pageable);
+                List<AbstractContacts> foundArchive = (List<AbstractContacts>) pageArchiveEntity.getContent();
+                if (!foundCurrent.isEmpty()) {
+                    for (int i = foundCurrent.size(), j = 0; i < pageSize; i++, j++) {
+                        if (j < foundArchive.size()) {
+                            foundCurrent.add(foundArchive.get(i));
+                            count++;
+                        } else
+                            break;
+                    }
+                }
+
+            }
+            return new ContactSearchDto(foundCurrent, page, pageSize, (pageCurrentEntity.getTotalElements() + count)); //TODO wrong totalElements!!!
+        }
     }
 
 
@@ -92,7 +113,26 @@ public class ContactsService {
 
     @Transactional
     public void updateById(UUID id, ContactsDataDto contactData) {
-        ContactsEntity entity = contactRepository.findById(id).orElseThrow(() -> new ContactNotFoundException(String.valueOf(id.toString())));
+        try {
+            ContactsEntity entity = contactRepository.findById(id).orElseThrow(() -> new ContactNotFoundException(String.valueOf(id.toString())));
+            updateEntity(contactData, entity);
+            try {
+                contactRepository.save(entity);
+            } catch (Exception e) {
+                throw new DatabaseUpdatingException(e.getMessage());
+            }
+        } catch (ContactNotFoundException e) {
+            ContactArchiveEntity entity = archiveRepository.findById(id).orElseThrow(() -> new ContactNotFoundInArchiveAndCurrentException(String.valueOf(id.toString())));
+            updateEntity(contactData, entity);
+            try {
+                archiveRepository.save(entity);
+            } catch (Exception f) {
+                throw new DatabaseUpdatingException(e.getMessage());
+            }
+        }
+    }
+
+    private <T extends AbstractContacts> void updateEntity(ContactsDataDto contactData, T entity) {
         entity.setContactName(contactData.getContactName());
         entity.setPhone(contactData.getPhone());
         entity.setEmail(contactData.getEmail());
@@ -100,11 +140,6 @@ public class ContactsService {
         entity.setStatusId(contactData.getStatusId());
         entity.setBranchId(contactData.getBranchId());
         entity.setTargetCourseId(contactData.getTargetCourseId());
-        try {
-            contactRepository.save(entity);
-        } catch (Exception e) {
-            throw new DatabaseUpdatingException(e.getMessage());
-        }
     }
 
     @Transactional
@@ -121,7 +156,7 @@ public class ContactsService {
         ContactsEntity contact = contactRepository.findById(id).orElseThrow(() -> new ContactNotFoundException(id.toString()));
         int statusId = statusRepository.getStatusEntityByStatusName("Archive").getStatusId();
         contact.setStatusId(statusId);
-        ContactArchiveEntity contactArchEntity = new ContactArchiveEntity(contact,reason);
+        ContactArchiveEntity contactArchEntity = new ContactArchiveEntity(contact, reason);
         try {
             contactRepository.deleteContactById(id);
         } catch (Exception e) {

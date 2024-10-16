@@ -9,7 +9,7 @@ public class  ContactsFilterSpecifications <E extends AbstractContacts>{
 
 
     public Specification<E> hasName(String name) {
-        return (r, q, cb) -> cb.like(r.get("contact_name"), "%" + name + "%");
+        return (r, q, cb) -> cb.like(r.get("contactName"), "%" + name + "%");
     }
 
     public Specification<E> hasPhone(String phone) {
@@ -21,7 +21,7 @@ public class  ContactsFilterSpecifications <E extends AbstractContacts>{
 
 
     public Specification<E> hasStatusId(int status_id) {
-        return (r, q, cb) -> cb.equal(r.get("status_id"), status_id);
+        return (r, q, cb) -> cb.equal(r.get("statusId"), status_id);
     }
 
 

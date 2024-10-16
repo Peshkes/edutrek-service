@@ -17,6 +17,6 @@ public interface ContactsRepository extends JpaRepository<ContactsEntity, UUID> 
     ContactsEntity findByPhoneOrEmail(String phone, String email);
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM ONLY contacts WHERE contact_id = :id", nativeQuery = true)
-    int deleteContactById(UUID id);
+    @Query(value = "DELETE FROM current.contacts WHERE contact_id = :id", nativeQuery = true)
+    void deleteContactById(UUID id);
 }
