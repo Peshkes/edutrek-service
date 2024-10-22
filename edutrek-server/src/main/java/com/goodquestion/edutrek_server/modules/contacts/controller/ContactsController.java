@@ -4,19 +4,15 @@ package com.goodquestion.edutrek_server.modules.contacts.controller;
 import com.goodquestion.edutrek_server.modules.contacts.dto.ContactSearchDto;
 import com.goodquestion.edutrek_server.modules.contacts.dto.ContactsDataDto;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.AbstractContacts;
-import com.goodquestion.edutrek_server.modules.contacts.persistence.current.ContactsEntity;
 import com.goodquestion.edutrek_server.modules.contacts.service.ContactsService;
 import com.goodquestion.edutrek_server.modules.students.dto.StudentsDataDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-
 import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 
 import java.util.UUID;
 

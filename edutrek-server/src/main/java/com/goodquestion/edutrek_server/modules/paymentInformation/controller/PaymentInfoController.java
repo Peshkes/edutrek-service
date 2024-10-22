@@ -2,14 +2,13 @@ package com.goodquestion.edutrek_server.modules.paymentInformation.controller;
 
 import com.goodquestion.edutrek_server.modules.paymentInformation.dto.PaymentInfoDataDto;
 import com.goodquestion.edutrek_server.modules.paymentInformation.persistence.AbstractPaymentInformation;
-import com.goodquestion.edutrek_server.modules.paymentInformation.persistence.current.PaymentInfoEntity;
-
 import com.goodquestion.edutrek_server.modules.paymentInformation.service.PaymentInfoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.UUID;
 
 @RestController

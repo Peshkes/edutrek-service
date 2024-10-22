@@ -1,10 +1,8 @@
 package com.goodquestion.edutrek_server.modules.students.persistence.archive;
 
 import com.goodquestion.edutrek_server.modules.students.persistence.IStudentRepository;
-import com.goodquestion.edutrek_server.modules.students.persistence.current.StudentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;

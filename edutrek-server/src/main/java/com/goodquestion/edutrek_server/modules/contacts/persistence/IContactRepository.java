@@ -1,8 +1,5 @@
 package com.goodquestion.edutrek_server.modules.contacts.persistence;
 
-import com.goodquestion.edutrek_server.modules.contacts.persistence.current.ContactsEntity;
-import com.goodquestion.edutrek_server.modules.lecturer.persistence.BaseLecturer;
-import jakarta.validation.constraints.Pattern;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.NoRepositoryBean;

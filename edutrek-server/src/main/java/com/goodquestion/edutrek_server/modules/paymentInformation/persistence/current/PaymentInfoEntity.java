@@ -1,10 +1,12 @@
 package com.goodquestion.edutrek_server.modules.paymentInformation.persistence.current;
 
 import com.goodquestion.edutrek_server.modules.paymentInformation.persistence.AbstractPaymentInformation;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity

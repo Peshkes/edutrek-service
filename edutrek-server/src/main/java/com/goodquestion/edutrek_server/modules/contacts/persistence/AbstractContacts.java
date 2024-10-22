@@ -3,9 +3,9 @@ package com.goodquestion.edutrek_server.modules.contacts.persistence;
 import com.goodquestion.edutrek_server.modules.contacts.dto.ContactsDataDto;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.current.ContactsEntity;
 import com.goodquestion.edutrek_server.modules.students.persistence.AbstractStudent;
-import com.goodquestion.edutrek_server.modules.students.persistence.current.StudentEntity;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.util.UUID;
 
 @Data
