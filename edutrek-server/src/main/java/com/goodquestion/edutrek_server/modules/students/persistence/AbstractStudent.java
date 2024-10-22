@@ -50,8 +50,21 @@ public abstract class AbstractStudent {
         this.documentsDone = documentsDone;
     }
 
-    public AbstractStudent(StudentsDataDto studentsDataDto) {
+    public AbstractStudent(StudentsDataDto studentsDataDto, int statusId) {
         this.studentId = UUID.randomUUID();
+        this.contactName = studentsDataDto.getContactName();
+        this.phone = studentsDataDto.getPhone();
+        this.email = studentsDataDto.getEmail();
+        this.statusId = statusId;
+        this.branchId = studentsDataDto.getBranchId();
+        this.targetCourseId = studentsDataDto.getTargetCourseId();
+        this.comment = studentsDataDto.getComment();
+        this.fullPayment = studentsDataDto.getFullPayment();
+        this.documentsDone = studentsDataDto.isDocumentsDone();
+    }
+
+    public AbstractStudent(UUID id, StudentsDataDto studentsDataDto) {
+        this.studentId = id;
         this.contactName = studentsDataDto.getContactName();
         this.phone = studentsDataDto.getPhone();
         this.email = studentsDataDto.getEmail();

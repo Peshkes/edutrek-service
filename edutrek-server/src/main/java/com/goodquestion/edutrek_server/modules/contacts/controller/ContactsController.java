@@ -3,6 +3,7 @@ package com.goodquestion.edutrek_server.modules.contacts.controller;
 
 import com.goodquestion.edutrek_server.modules.contacts.dto.ContactSearchDto;
 import com.goodquestion.edutrek_server.modules.contacts.dto.ContactsDataDto;
+import com.goodquestion.edutrek_server.modules.contacts.persistence.AbstractContacts;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.current.ContactsEntity;
 import com.goodquestion.edutrek_server.modules.contacts.service.ContactsService;
 import com.goodquestion.edutrek_server.modules.students.dto.StudentsDataDto;
@@ -33,14 +34,15 @@ public class ContactsController {
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "pagesize",defaultValue = "10") int pageSize,
             @RequestParam(name = "search",required = false) String search,
-            @RequestParam(name = "statusid",required = false) Integer statusId
+            @RequestParam(name = "statusid",required = false) Integer statusId,
+            @RequestParam(name = "targetCourseId",required = false) UUID courseId
     ) {
-        return contactsService.getAll(page, pageSize, search, statusId);
+        return contactsService.getAll(page, pageSize, search, statusId, courseId);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ContactsEntity getById(@PathVariable UUID id) {
+    public AbstractContacts getById(@PathVariable UUID id) {
         return contactsService.getById(id);
     }
 
@@ -55,7 +57,6 @@ public class ContactsController {
         contactsService.deleteById(id);
         return new ResponseEntity<>("Contact deleted", HttpStatus.OK);
     }
-
 
     @PutMapping("/{id}")
     public ResponseEntity<String> updateById(@PathVariable UUID id, @RequestBody @Valid ContactsDataDto contactData) {
@@ -74,11 +75,7 @@ public class ContactsController {
         contactsService.promoteContactToStudentById(id,studentData);
         return new ResponseEntity<>("Contact promoted to student", HttpStatus.OK);
     }
-//    @PostMapping("/test/{id}/")
-//    public ResponseEntity<String> test (@PathVariable UUID id,@RequestParam StudentsInfoDataDto studentData) {
-//        contactsService.promoteContactToStudentById(id,studentData);
-//        return new ResponseEntity<>("Contact promoted to student", HttpStatus.OK);
-//    }
+
 
 
 

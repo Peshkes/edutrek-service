@@ -1,13 +1,9 @@
 package com.goodquestion.edutrek_server.modules.students.controller;
 
 
-
 import com.goodquestion.edutrek_server.modules.students.dto.StudentSearchDto;
-import com.goodquestion.edutrek_server.modules.students.dto.StudentsAddDto;
-import com.goodquestion.edutrek_server.modules.students.dto.StudentsInfoDataFromContactDto;
-
-import com.goodquestion.edutrek_server.modules.students.persistence.current.StudentEntity;
-
+import com.goodquestion.edutrek_server.modules.students.dto.StudentsDataDto;
+import com.goodquestion.edutrek_server.modules.students.persistence.AbstractStudent;
 import com.goodquestion.edutrek_server.modules.students.service.StudentsService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,53 +19,53 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class StudentsController {
 
-    private final StudentsService studentsInfoService;
+    private final StudentsService studentService;
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public StudentSearchDto getAll(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) Integer statusId,
-            @RequestParam(required = false) Integer groupId) {
-        return studentsInfoService.getAll(page,pageSize,search,statusId,groupId);
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "pagesize", defaultValue = "10") int pageSize,
+            @RequestParam(name = "search", required = false) String search,
+            @RequestParam(name = "statusid", required = false) Integer statusId,
+            @RequestParam(name = "groupid", required = false) Integer groupId) {
+        return studentService.getAll(page,pageSize,search,statusId,groupId);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public StudentEntity getById(@PathVariable UUID id) {
-        return studentsInfoService.getById(id);
+    public AbstractStudent getById(@PathVariable UUID id) {
+        return studentService.getById(id);
     }
 
     @PostMapping("")
-    public ResponseEntity<String> addEntity(@RequestBody @Valid StudentsAddDto studentsAddDto) {
-        studentsInfoService.addEntity(studentsAddDto.contactData(), studentsAddDto.studentsInfoData());
+    public ResponseEntity<String> addEntity(@RequestBody @Valid StudentsDataDto studentDto) {
+        studentService.addEntity(studentDto);
         return new ResponseEntity<>("Student created", HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteById(@PathVariable UUID id) {
-        studentsInfoService.deleteById(id);
+        studentService.deleteById(id);
         return new ResponseEntity<>("Student deleted", HttpStatus.OK);
     }
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateById(@PathVariable UUID id, @RequestBody @Valid StudentsInfoDataFromContactDto contactData) {
-        studentsInfoService.updateById(id, contactData);
+    public ResponseEntity<String> updateById(@PathVariable UUID id, @RequestBody @Valid StudentsDataDto contactData) {
+        studentService.updateById(id, contactData);
         return new ResponseEntity<>("Student updated", HttpStatus.OK);
     }
 
     @PutMapping("/archive/{id}/{reason}")
     public ResponseEntity<String> moveToArchiveById(@PathVariable UUID id,@PathVariable @DefaultValue("") String reason) {
-        studentsInfoService.moveToArchiveById(id, reason);
+        studentService.moveToArchiveById(id, reason);
         return new ResponseEntity<>("Student moved to archive", HttpStatus.OK);
     }
 
     @PutMapping("/graduate/{id}")
     public ResponseEntity<String> graduateById(@PathVariable UUID id) {
-        studentsInfoService.graduateById(id);
+        studentService.graduateById(id);
         return new ResponseEntity<>("Student moved to archive", HttpStatus.OK);
     }
 

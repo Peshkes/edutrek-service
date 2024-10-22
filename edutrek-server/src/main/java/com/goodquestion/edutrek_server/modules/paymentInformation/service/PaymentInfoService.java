@@ -5,8 +5,11 @@ import com.goodquestion.edutrek_server.error.DatabaseException.DatabaseDeletingE
 import com.goodquestion.edutrek_server.error.DatabaseException.DatabaseUpdatingException;
 import com.goodquestion.edutrek_server.error.ShareException.*;
 import com.goodquestion.edutrek_server.modules.paymentInformation.dto.PaymentInfoDataDto;
+import com.goodquestion.edutrek_server.modules.paymentInformation.persistence.AbstractPaymentInformation;
+import com.goodquestion.edutrek_server.modules.paymentInformation.persistence.archive.PaymentInfoArchiveRepository;
 import com.goodquestion.edutrek_server.modules.paymentInformation.persistence.current.PaymentInfoEntity;
 import com.goodquestion.edutrek_server.modules.paymentInformation.persistence.current.PaymentInfoRepository;
+import com.goodquestion.edutrek_server.modules.students.persistence.current.StudentsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
@@ -23,26 +27,29 @@ import java.util.UUID;
 public class PaymentInfoService {
 
     private final PaymentInfoRepository repository;
+    private final PaymentInfoArchiveRepository archiveRepository;
+    private final StudentsRepository studentsRepository;
 
-//    @Cacheable(key = "#root.methodName")
-//    public List<CourseEntity> getAll() {
-//        return repository.findAll();
-//    }
 
-    public PaymentInfoEntity getById(UUID paymentInfoId) {
-        return repository.findById(paymentInfoId).orElseThrow(() -> new PaymentInfoNotFoundException(String.valueOf(paymentInfoId)));
+    public AbstractPaymentInformation getByPaymentId(UUID paymentId) {
+        return repository.findByPaymentId(paymentId).or(() -> archiveRepository.findById(paymentId)).orElseThrow(() -> new PaymentInfoNotFoundException(paymentId.toString()));
+    }
+    public AbstractPaymentInformation getByStudentId(UUID studentId) {
+        return repository.findByStudentId(studentId).or(() -> archiveRepository.findById(studentId)).orElseThrow(() -> new PaymentInfoNotFoundException(studentId.toString()));
     }
 
     @Transactional
     @CacheEvict(key = "{'getAll'}")
-    public void addEntity(PaymentInfoDataDto paymentInfoDataDtoData) {
+    public void addEntity(PaymentInfoDataDto paymentInfoDtoData) {
+        if (!studentsRepository.existsById(paymentInfoDtoData.getStudentId())) {
+            throw new StudentNotFoundException(String.valueOf(paymentInfoDtoData.getStudentId()));
+        }
         try {
             repository.save(new PaymentInfoEntity(
-                    paymentInfoDataDtoData.getStudentId(),
-                    paymentInfoDataDtoData.getPaymentDate(),
-                    paymentInfoDataDtoData.getPaymentTypeId(),
-                    paymentInfoDataDtoData.getPaymentUmount(),
-                    paymentInfoDataDtoData.getPaymentDetails()));
+                    paymentInfoDtoData.getStudentId(),
+                    paymentInfoDtoData.getPaymentTypeId(),
+                    paymentInfoDtoData.getPaymentUmount(),
+                    paymentInfoDtoData.getPaymentDetails()));
         } catch (Exception e) {
             throw new DatabaseAddingException(e.getMessage());
         }
@@ -64,7 +71,6 @@ public class PaymentInfoService {
     @CachePut(key = "#id")
     public void updateById(UUID id, PaymentInfoDataDto paymentInfoDataDto) {
         PaymentInfoEntity paymentEntity = repository.findById(id).orElseThrow(() -> new PaymentInfoNotFoundException(String.valueOf(id)));
-
         paymentEntity.setStudentId(paymentInfoDataDto.getStudentId());
         paymentEntity.setPaymentDate(paymentInfoDataDto.getPaymentDate());
         paymentEntity.setPaymentTypeId(paymentInfoDataDto.getPaymentTypeId());

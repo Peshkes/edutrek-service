@@ -1,6 +1,7 @@
 package com.goodquestion.edutrek_server.modules.paymentInformation.controller;
 
 import com.goodquestion.edutrek_server.modules.paymentInformation.dto.PaymentInfoDataDto;
+import com.goodquestion.edutrek_server.modules.paymentInformation.persistence.AbstractPaymentInformation;
 import com.goodquestion.edutrek_server.modules.paymentInformation.persistence.current.PaymentInfoEntity;
 
 import com.goodquestion.edutrek_server.modules.paymentInformation.service.PaymentInfoService;
@@ -18,16 +19,18 @@ public class PaymentInfoController {
 
     private final PaymentInfoService paymentInfoService;
 
-//    @GetMapping("")
-//    @ResponseStatus(HttpStatus.OK)
-//    public List<CourseEntity> getAllCourses() {
-//        return courseService.getAll();
-//    }
 
-    @GetMapping("/{id}")
+
+    @GetMapping("/paymentid/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public PaymentInfoEntity getPaymentInfoById(@PathVariable UUID id) {
-        return paymentInfoService.getById(id);
+    public AbstractPaymentInformation getByPaymentId(@PathVariable UUID id) {
+        return paymentInfoService.getByPaymentId(id);
+    }
+
+    @GetMapping("/studentid/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public AbstractPaymentInformation getByStudentId(@PathVariable UUID id) {
+        return paymentInfoService.getByStudentId(id);
     }
 
     @PostMapping("")

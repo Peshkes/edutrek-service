@@ -5,7 +5,7 @@ import org.springframework.data.jpa.domain.Specification;
 public class GroupSpecifications {
 
     public static <T extends BaseGroup> Specification<T> hasCourseId(String courseId) {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("course").get("courseId"), courseId);
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("courseId"), courseId);
     }
 
     public static <T extends BaseGroup> Specification<T> hasIsActive(Boolean isActive) {

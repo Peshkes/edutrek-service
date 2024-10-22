@@ -3,6 +3,7 @@ package com.goodquestion.edutrek_server.modules.contacts.persistence.current;
 
 
 
+import com.goodquestion.edutrek_server.modules.contacts.persistence.IContactRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -13,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Repository
-public interface ContactsRepository extends JpaRepository<ContactsEntity, UUID> , JpaSpecificationExecutor<ContactsEntity> {
+public interface ContactsRepository extends IContactRepository<ContactsEntity>,JpaRepository<ContactsEntity, UUID> , JpaSpecificationExecutor<ContactsEntity> {
     ContactsEntity findByPhoneOrEmail(String phone, String email);
     @Modifying
     @Transactional

@@ -16,16 +16,11 @@ import java.util.UUID;
 @Table(schema = "current", name = "students")
 public class StudentEntity extends AbstractStudent {
 
-
-    public StudentEntity(String contactName, String phone, String email, int statusId, int branchId, UUID targetCourseId, String comment, int fullPayment, boolean documentsDone) {
-        super(contactName, phone, email, statusId, branchId, targetCourseId, comment, fullPayment, documentsDone);
+    public StudentEntity(StudentsDataDto studentsDataDto, int statusId) {
+        super(studentsDataDto,statusId);
     }
 
-    public StudentEntity(StudentEntity studentEntity) {
-        super(studentEntity);
-    }
-
-    public StudentEntity(StudentsDataDto studentsDataDto) {
-        super(studentsDataDto);
+    public StudentEntity(UUID id, StudentsDataDto studentsDataDto) {
+        super(id, studentsDataDto);
     }
 }

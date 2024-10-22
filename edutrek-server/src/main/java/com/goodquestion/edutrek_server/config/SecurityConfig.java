@@ -80,6 +80,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/logs/{id}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/logs/{id}").authenticated()
 
+                        .requestMatchers(HttpMethod.GET,  "/payments/paymentid/{id}", "/payments/studentid/{id}").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/payments").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/payments/{id}").hasRole(PRINCIPAL.toString())
+                        .requestMatchers(HttpMethod.PUT, "/payments/{id}").authenticated()
+
+                        .requestMatchers(HttpMethod.GET,  "/payment_types/{id}", "/payment_types").authenticated()
+
                         .requestMatchers(HttpMethod.GET, "/statuses", "/statuses/{statusId}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/statuses").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.DELETE, "/statuses/{id}").hasRole(PRINCIPAL.toString())

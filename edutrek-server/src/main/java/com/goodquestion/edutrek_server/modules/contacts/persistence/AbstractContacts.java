@@ -2,6 +2,8 @@ package com.goodquestion.edutrek_server.modules.contacts.persistence;
 
 import com.goodquestion.edutrek_server.modules.contacts.dto.ContactsDataDto;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.current.ContactsEntity;
+import com.goodquestion.edutrek_server.modules.students.persistence.AbstractStudent;
+import com.goodquestion.edutrek_server.modules.students.persistence.current.StudentEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.UUID;
@@ -10,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @MappedSuperclass
+@EqualsAndHashCode
 public class AbstractContacts {
     @Id
     @Setter(AccessLevel.NONE)
@@ -51,6 +54,17 @@ public class AbstractContacts {
         this.branchId = contactEntity.getBranchId();
         this.targetCourseId = contactEntity.getTargetCourseId();
         this.comment = contactEntity.getComment();
+    }
+
+    public AbstractContacts(AbstractStudent abstractStudent) {
+        this.contactId = UUID.randomUUID();
+        this.contactName = abstractStudent.getContactName();
+        this.phone = abstractStudent.getPhone();
+        this.email = abstractStudent.getEmail();
+        this.statusId = abstractStudent.getStatusId();
+        this.branchId = abstractStudent.getBranchId();
+        this.targetCourseId = abstractStudent.getTargetCourseId();
+        this.comment = abstractStudent.getComment();
     }
 
     public AbstractContacts(ContactsDataDto contactsDataDto) {
