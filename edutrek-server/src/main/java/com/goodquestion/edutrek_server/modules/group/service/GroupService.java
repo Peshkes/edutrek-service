@@ -57,10 +57,9 @@ public class GroupService {
         List<? extends BaseGroup> groups;
         long totalGroups;
 
-        Specification<? extends BaseGroup> specification = Specification.where(GroupSpecifications.hasIsActive(true));
-        if (courseId != null) specification = specification.and(GroupSpecifications.hasCourseId(courseId));
-        if (search != null && !search.isEmpty())
-            specification = specification.and(GroupSpecifications.searchByQuery(search));
+        Specification<? extends BaseGroup> specification = Specification.where(null);
+        if (courseId != null) specification = specification.and(GroupSpecifications.hasCourseId(UUID.fromString(courseId)));
+        if (search != null && !search.isEmpty()) specification = specification.and(GroupSpecifications.searchByQuery(search));
 
         if (isActive != null) {
             Page<? extends BaseGroup> retrievedGroups = isActive

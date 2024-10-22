@@ -2,14 +2,12 @@ package com.goodquestion.edutrek_server.modules.group.persistence.groups;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.UUID;
+
 public class GroupSpecifications {
 
-    public static <T extends BaseGroup> Specification<T> hasCourseId(String courseId) {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("course").get("courseId"), courseId);
-    }
-
-    public static <T extends BaseGroup> Specification<T> hasIsActive(Boolean isActive) {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("isActive"), isActive);
+    public static <T extends BaseGroup> Specification<T> hasCourseId(UUID courseId) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("courseId"), courseId);
     }
 
     public static <T extends BaseGroup> Specification<T> searchByQuery(String searchQuery) {
