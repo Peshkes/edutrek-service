@@ -32,11 +32,11 @@ public class GroupController {
     public PaginationGroupResponseDto getAllGroupsPaginated(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int limit,
-            @RequestParam(required = false) @UUID String courseId,
-            @RequestParam(required = false) Boolean isActive,
+            @RequestParam(required = false) @UUID String filter_course,
+            @RequestParam(required = false) Boolean filter_is_active,
             @RequestParam(required = false) String search
     ) {
-        return groupService.getAllPaginated(page, limit, courseId, isActive, search);
+        return groupService.getAllPaginated(page, limit, filter_course, filter_is_active, search);
     }
 
     @PostMapping("")
