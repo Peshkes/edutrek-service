@@ -1,6 +1,7 @@
 package com.goodquestion.edutrek_server.modules.paymentInformation.controller;
 
 import com.goodquestion.edutrek_server.modules.paymentInformation.dto.PaymentInfoDataDto;
+import com.goodquestion.edutrek_server.modules.paymentInformation.dto.PaymentsInfoSearchDto;
 import com.goodquestion.edutrek_server.modules.paymentInformation.persistence.AbstractPaymentInformation;
 import com.goodquestion.edutrek_server.modules.paymentInformation.service.PaymentInfoService;
 import jakarta.validation.Valid;
@@ -28,8 +29,11 @@ public class PaymentInfoController {
 
     @GetMapping("/studentid/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public AbstractPaymentInformation getByStudentId(@PathVariable UUID id) {
-        return paymentInfoService.getByStudentId(id);
+    public PaymentsInfoSearchDto getByStudentId(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "pagesize", defaultValue = "10") int pageSize,
+            @PathVariable UUID id) {
+        return paymentInfoService.getByStudentId(page,pageSize,id);
     }
 
     @PostMapping("")
@@ -49,6 +53,12 @@ public class PaymentInfoController {
     public ResponseEntity<String> updatePaymentInfoById(@PathVariable UUID id, @RequestBody @Valid PaymentInfoDataDto paymentInfoData) {
         paymentInfoService.updateById(id, paymentInfoData);
         return new ResponseEntity<>("Payment info updated", HttpStatus.OK);
+    }
+
+    @PutMapping("/archive/{id}")
+    public ResponseEntity<String> moveToArchiveById(@PathVariable UUID id) {
+        paymentInfoService.movePaymentsToArchive(id);
+        return new ResponseEntity<>("Payment moved to archive", HttpStatus.OK);
     }
 
 

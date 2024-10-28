@@ -5,7 +5,7 @@ import com.goodquestion.edutrek_server.modules.contacts.dto.ContactSearchDto;
 import com.goodquestion.edutrek_server.modules.contacts.dto.ContactsDataDto;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.AbstractContacts;
 import com.goodquestion.edutrek_server.modules.contacts.service.ContactsService;
-import com.goodquestion.edutrek_server.modules.students.dto.StudentsDataDto;
+import com.goodquestion.edutrek_server.modules.students.dto.StudentsFromContactDataDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.bind.DefaultValue;
@@ -29,9 +29,9 @@ public class ContactsController {
     public ContactSearchDto getAll(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "pagesize",defaultValue = "10") int pageSize,
-            @RequestParam(name = "search",required = false) String search,
-            @RequestParam(name = "statusid",required = false) Integer statusId,
-            @RequestParam(name = "targetCourseId",required = false) UUID courseId
+            @RequestParam(name = "search", required = false) String search,
+            @RequestParam(name = "statusid", required = false) Integer statusId,
+            @RequestParam(name = "targetcourseid", required = false) UUID courseId
     ) {
         return contactsService.getAll(page, pageSize, search, statusId, courseId);
     }
@@ -67,7 +67,7 @@ public class ContactsController {
     }
 
     @PostMapping("/promote/{id}")
-    public ResponseEntity<String> promoteContactToStudentById(@PathVariable UUID id,@RequestBody @Valid StudentsDataDto studentData) {
+    public ResponseEntity<String> promoteContactToStudentById(@PathVariable UUID id,@RequestBody @Valid StudentsFromContactDataDto studentData) {
         contactsService.promoteContactToStudentById(id,studentData);
         return new ResponseEntity<>("Contact promoted to student", HttpStatus.OK);
     }

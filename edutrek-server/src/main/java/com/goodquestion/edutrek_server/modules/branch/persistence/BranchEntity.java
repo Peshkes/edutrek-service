@@ -21,6 +21,7 @@ public class BranchEntity {
     @Column(name = "branch_address")
     private String branchAddress;
 
+
     public BranchEntity(String branchName, String branchAddress) {
         this.branchName = branchName;
         this.branchAddress = branchAddress;

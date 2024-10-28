@@ -1,5 +1,6 @@
 package com.goodquestion.edutrek_server.modules.paymentInformation.persistence;
 
+import com.goodquestion.edutrek_server.modules.paymentInformation.persistence.current.PaymentInfoEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +14,6 @@ import java.util.UUID;
 public class AbstractPaymentInformation {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "payment_id")
     @Setter(AccessLevel.NONE)
     private UUID paymentId;
@@ -40,5 +40,14 @@ public class AbstractPaymentInformation {
         this.paymentTypeId = paymentTypeId;
         this.paymentUmount = paymentUmount;
         this.paymentDetails = paymentDetails;
+    }
+
+    public AbstractPaymentInformation(PaymentInfoEntity paymentInfoEntity) {
+        this.paymentId = paymentInfoEntity.getPaymentId();
+        this.studentId = paymentInfoEntity.getStudentId();
+        this.paymentDate = paymentInfoEntity.getPaymentDate();
+        this.paymentTypeId = paymentInfoEntity.getPaymentTypeId();
+        this.paymentUmount = paymentInfoEntity.getPaymentUmount();
+        this.paymentDetails = paymentInfoEntity.getPaymentDetails();
     }
 }

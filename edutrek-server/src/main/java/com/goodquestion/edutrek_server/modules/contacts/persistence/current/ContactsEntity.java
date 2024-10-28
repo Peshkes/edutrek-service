@@ -21,6 +21,10 @@ public class ContactsEntity extends AbstractContacts {
         super(contactEntity);
     }
 
+    public ContactsEntity(AbstractContacts contactEntity) {
+        super(contactEntity);
+    }
+
     public ContactsEntity(ContactsDataDto contactsDataDto) {
         super(contactsDataDto);
     }

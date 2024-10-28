@@ -11,7 +11,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -50,6 +49,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth", "/auth/refresh").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/auth/{id}").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.PUT, "/auth/login/{id}", "/auth/password/{id}").access(ownerAuthorizationManager)
+                        .requestMatchers(HttpMethod.GET,  "/auth/ping" ).permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/branches", "/branches/{id}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/branches").hasRole(PRINCIPAL.toString())
@@ -80,12 +80,19 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/logs/{id}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/logs/{id}").authenticated()
 
+                        .requestMatchers(HttpMethod.GET, "/notifications/{id}", "/notifications/all/{id}").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/notifications/{id}").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/notifications/{id}", "/notifications").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/notifications/{id}").authenticated()
+
                         .requestMatchers(HttpMethod.GET,  "/payments/paymentid/{id}", "/payments/studentid/{id}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/payments").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/payments/{id}").hasRole(PRINCIPAL.toString())
-                        .requestMatchers(HttpMethod.PUT, "/payments/{id}").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/payments/{id}", "/payments/archive/{id}").authenticated()
 
                         .requestMatchers(HttpMethod.GET,  "/payment_types/{id}", "/payment_types").authenticated()
+
+
 
                         .requestMatchers(HttpMethod.GET, "/statuses", "/statuses/{statusId}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/statuses").hasRole(PRINCIPAL.toString())
@@ -103,8 +110,8 @@ public class SecurityConfig {
         );
         http.csrf(csrf -> csrfTokenRepository());
 //        http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.csrf(AbstractHttpConfigurer::disable);
-        //      http.cors(cors -> corsConfigurationSource());
+//        http.csrf(AbstractHttpConfigurer::disable);
+              http.cors(cors -> corsConfigurationSource());
         http.addFilterBefore(expiredPasswordFilter, BasicAuthenticationFilter.class);
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 

@@ -1,9 +1,10 @@
 package com.goodquestion.edutrek_server.modules.contacts.persistence;
 
 import com.goodquestion.edutrek_server.modules.contacts.dto.ContactsDataDto;
-import com.goodquestion.edutrek_server.modules.contacts.persistence.current.ContactsEntity;
 import com.goodquestion.edutrek_server.modules.students.persistence.AbstractStudent;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 import lombok.*;
 
 import java.util.UUID;
@@ -12,11 +13,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @MappedSuperclass
-@EqualsAndHashCode
 public class AbstractContacts {
     @Id
     @Setter(AccessLevel.NONE)
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "contact_id")
     private UUID contactId;
     @Column(name = "contact_name")
@@ -45,7 +44,7 @@ public class AbstractContacts {
         this.comment = comment;
     }
 
-    public AbstractContacts(ContactsEntity contactEntity) {
+    public AbstractContacts(AbstractContacts contactEntity) {
         this.contactId = contactEntity.getContactId();
         this.contactName = contactEntity.getContactName();
         this.phone = contactEntity.getPhone();
@@ -57,7 +56,7 @@ public class AbstractContacts {
     }
 
     public AbstractContacts(AbstractStudent abstractStudent) {
-        this.contactId = UUID.randomUUID();
+        this.contactId = abstractStudent.getStudentId();
         this.contactName = abstractStudent.getContactName();
         this.phone = abstractStudent.getPhone();
         this.email = abstractStudent.getEmail();

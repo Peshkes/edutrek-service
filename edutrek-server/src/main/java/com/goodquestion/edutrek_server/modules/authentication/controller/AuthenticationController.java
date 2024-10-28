@@ -18,6 +18,7 @@ import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Validated
@@ -117,8 +118,14 @@ public class AuthenticationController {
         return authenticationService.deleteAccount(java.util.UUID.fromString(id));
     }
 
-    //UTILS
+    @GetMapping("/ping")
+    @ResponseStatus(HttpStatus.OK)
+    public  ResponseEntity<String> ping() {
+        System.out.println("Zapingovalsya in " + LocalDateTime.now());
+        return new ResponseEntity<>("Pong", HttpStatus.OK);
+    }
 
+    //UTILS
     private Cookie createCookie(String name, String value) {
         Cookie cookie = new Cookie(name, value);
         cookie.setHttpOnly(true);

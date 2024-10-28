@@ -204,6 +204,11 @@ public class ErrorController {
         return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(NotificationNotFoundException.class)
+    ResponseEntity<String> notificationNotFoundException(NotificationNotFoundException e) {
+        return returnResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
     private ResponseEntity<String> returnResponse(String message, HttpStatus status) {
         log.error(message);
         return new ResponseEntity<>(message, status);

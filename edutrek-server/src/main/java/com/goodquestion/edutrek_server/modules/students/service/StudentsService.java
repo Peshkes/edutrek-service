@@ -6,11 +6,14 @@ import com.goodquestion.edutrek_server.error.ShareException.StudentNotFoundExcep
 import com.goodquestion.edutrek_server.modules.contacts.persistence.AbstractContacts;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.current.ContactsRepository;
 import com.goodquestion.edutrek_server.modules.contacts.service.ContactsService;
+import com.goodquestion.edutrek_server.modules.paymentInformation.persistence.AbstractPaymentInformation;
+import com.goodquestion.edutrek_server.modules.paymentInformation.service.PaymentInfoService;
 import com.goodquestion.edutrek_server.modules.statuses.persistence.StatusEntity;
 import com.goodquestion.edutrek_server.modules.statuses.persistence.StatusRepository;
 import com.goodquestion.edutrek_server.modules.students.dto.FoundEntitiesDto;
 import com.goodquestion.edutrek_server.modules.students.dto.StudentSearchDto;
 import com.goodquestion.edutrek_server.modules.students.dto.StudentsDataDto;
+import com.goodquestion.edutrek_server.modules.students.dto.StudentsFromContactDataDto;
 import com.goodquestion.edutrek_server.modules.students.persistence.AbstractStudent;
 import com.goodquestion.edutrek_server.modules.students.persistence.archive.StudentsArchiveEntity;
 import com.goodquestion.edutrek_server.modules.students.persistence.archive.StudentsArchiveRepository;
@@ -38,26 +41,27 @@ public class StudentsService {
     private final ContactsService contactService;
     private final StudentsArchiveRepository archiveRepository;
     private final StatusRepository statusRepository;
+    private final PaymentInfoService paymentInfoService;
 
-
-    public StudentSearchDto getAll(int page, int pageSize, String search, Integer statusId, Integer groupId) {
+    @Loggable
+    public StudentSearchDto getAll(int page, int pageSize, String search, Integer statusId, UUID groupId, UUID courseId) {
         StatusEntity status = statusId == null ? null : statusRepository.findById(statusId).orElse(null);
         Pageable pageable = PageRequest.of(page, pageSize);
-        FoundEntitiesDto foundStudentEntities;
+        List<AbstractStudent> foundStudents;
         if (status != null && status.getStatusName().equalsIgnoreCase("Archive")) {
-            foundStudentEntities = findStudents(pageable, search, statusId, groupId, archiveRepository);
+            FoundEntitiesDto foundEntitiesDto = findStudents(pageable, search, statusId, groupId, courseId, archiveRepository);
+            foundStudents = foundEntitiesDto.getFoundStudents();
         } else {
-            foundStudentEntities = findStudents(pageable, search, statusId, groupId, repository);
-            List<AbstractStudent> foundStudents = foundStudentEntities.getFoundStudents();
+            FoundEntitiesDto foundStudentEntities = findStudents(pageable, search, statusId, groupId, courseId, repository);
+            foundStudents = foundStudentEntities.getFoundStudents();
             if (foundStudents.size() < pageSize) {
-                FoundEntitiesDto foundStudentArchiveEntities = findStudents(PageRequest.of(page, pageSize - foundStudents.size()), search, statusId, groupId, archiveRepository);
+                FoundEntitiesDto foundStudentArchiveEntities = findStudents(PageRequest.of(page, pageSize - foundStudents.size()), search, statusId, groupId, courseId, archiveRepository);
                 List<AbstractStudent> foundStudentsArchive = foundStudentArchiveEntities.getFoundStudents();
-                if (!foundStudentsArchive.isEmpty()) {
+                if (!foundStudentsArchive.isEmpty())
                     foundStudents.addAll(foundStudentsArchive);
-                }
             }
         }
-        return new StudentSearchDto(foundStudentEntities.getFoundStudents(), page, pageSize, foundStudentEntities.getTotalElements());
+        return new StudentSearchDto(foundStudents, page, pageSize, foundStudents.size());
     }
 
 
@@ -75,7 +79,7 @@ public class StudentsService {
                 repository.save(new StudentEntity(
                         studentData, statusId));
             } else {
-                contactService.promoteContactToStudentById(contact.getContactId(), studentData);
+                contactService.promoteContactToStudentById(contact.getContactId(), new StudentsFromContactDataDto(studentData.getFullPayment(), studentData.isDocumentsDone()));
             }
         }
     }
@@ -99,11 +103,12 @@ public class StudentsService {
     }
 
     private <T extends AbstractStudent> void updateEntity(StudentsDataDto studentData, T entity) {
+        int statusId = statusRepository.findStatusEntityByStatusName("Student").getStatusId();
         entity.setContactName(studentData.getContactName());
         entity.setPhone(studentData.getPhone());
         entity.setEmail(studentData.getEmail());
         entity.setComment(studentData.getComment());
-        entity.setStatusId(studentData.getStatusId());
+        entity.setStatusId(statusId);
         entity.setBranchId(studentData.getBranchId());
         entity.setTargetCourseId(studentData.getTargetCourseId());
         entity.setFullPayment(studentData.getFullPayment());
@@ -118,15 +123,18 @@ public class StudentsService {
         student.setStatusId(statusId);
         StudentsArchiveEntity studentArchEntity = new StudentsArchiveEntity(student, reason);
         try {
+            List<AbstractPaymentInformation> payments = paymentInfoService.getByStudentId(0, 10, id).paymentsInfo();
+            archiveRepository.save(studentArchEntity);
+            payments.forEach(p -> paymentInfoService.movePaymentsToArchive(p.getPaymentId()));
+        } catch (Exception e) {
+            throw new DatabaseAddingException(e.getMessage());
+        }
+        try {
             repository.deleteById(id);
         } catch (Exception e) {
             throw new DatabaseDeletingException(e.getMessage());
         }
-        try {
-            archiveRepository.save(studentArchEntity);
-        } catch (Exception e) {
-            throw new DatabaseAddingException(e.getMessage());
-        }
+
     }
 
     @Loggable

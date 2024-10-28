@@ -99,6 +99,12 @@ public class ShareException extends RuntimeException {
         }
     }
 
+    public static class NotificationNotFoundException extends ShareException {
+        public NotificationNotFoundException(String message) {
+            super(NOTIFICATION_NOT_FOUND + message);
+        }
+    }
+
     public static class PaymentInfoNotFoundException extends ShareException {
         public PaymentInfoNotFoundException(String message) {
             super(PAYMENT_INFORMATION_NOT_FOUND + message);

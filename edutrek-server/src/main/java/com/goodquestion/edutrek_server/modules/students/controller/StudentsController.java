@@ -28,8 +28,9 @@ public class StudentsController {
             @RequestParam(name = "pagesize", defaultValue = "10") int pageSize,
             @RequestParam(name = "search", required = false) String search,
             @RequestParam(name = "statusid", required = false) Integer statusId,
-            @RequestParam(name = "groupid", required = false) Integer groupId) {
-        return studentService.getAll(page,pageSize,search,statusId,groupId);
+            @RequestParam(name = "groupid", required = false) UUID groupId,
+            @RequestParam(name = "targetcourseid", required = false) UUID courseId) {
+        return studentService.getAll(page,pageSize,search,statusId,groupId, courseId);
     }
 
     @GetMapping("/{id}")

@@ -17,6 +17,7 @@ public class WeekdayService {
 
     private final WeekdayRepository repository;
 
+    @Loggable
     public List<WeekdayEntity> getAll() {
         return repository.findAll();
     }

@@ -10,6 +10,7 @@ import static com.goodquestion.edutrek_server.error.ShareException.*;
 import com.goodquestion.edutrek_server.modules.statuses.dto.StatusDataDto;
 import com.goodquestion.edutrek_server.modules.statuses.persistence.StatusEntity;
 import com.goodquestion.edutrek_server.modules.statuses.persistence.StatusRepository;
+import com.goodquestion.edutrek_server.utility_service.logging.Loggable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -28,16 +29,19 @@ public class StatusService {
 
     private final StatusRepository repository;
 
+    @Loggable
     @Cacheable(key = "{'all'}")
     public List<StatusEntity> getAll() {
         return repository.findAll();
     }
 
+    @Loggable
     @Cacheable(key = "#id")
     public StatusEntity getById(int id) {
         return repository.findById(id).orElseThrow(() -> new StatusNotFoundException(id));
     }
 
+    @Loggable
     @Transactional
     @CacheEvict(key = "{'all'}")
     public void addEntity(StatusDataDto statusData) {
@@ -48,6 +52,7 @@ public class StatusService {
         }
     }
 
+    @Loggable
     @Transactional
     @CachePut(key = "#id")
     public void deleteById(int id) {
@@ -60,6 +65,7 @@ public class StatusService {
         }
     }
 
+    @Loggable
     @Transactional
     @CachePut(key = "#id")
     public void updateById(int id, String newName) { //заменил на стринг

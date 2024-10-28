@@ -12,14 +12,16 @@ import com.goodquestion.edutrek_server.modules.contacts.persistence.current.Cont
 import com.goodquestion.edutrek_server.modules.statuses.persistence.StatusEntity;
 import com.goodquestion.edutrek_server.modules.statuses.persistence.StatusRepository;
 import com.goodquestion.edutrek_server.modules.students.dto.FoundEntitiesDto;
-import com.goodquestion.edutrek_server.modules.students.dto.StudentsDataDto;
+import com.goodquestion.edutrek_server.modules.students.dto.StudentsFromContactDataDto;
 import com.goodquestion.edutrek_server.modules.students.persistence.AbstractStudent;
 
 
 import com.goodquestion.edutrek_server.modules.students.persistence.archive.StudentsArchiveRepository;
 import com.goodquestion.edutrek_server.modules.students.persistence.current.StudentEntity;
 import com.goodquestion.edutrek_server.modules.students.persistence.current.StudentsRepository;
+
 import static com.goodquestion.edutrek_server.utility_service.SearchUtilityMethods.*;
+
 import com.goodquestion.edutrek_server.utility_service.logging.Loggable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,19 +57,20 @@ public class ContactsService {
         Pageable pageable = PageRequest.of(page, pageSize);
         if (status != null && status.getStatusName().equalsIgnoreCase("Archive")) {
             FoundEntitiesDto foundContactArchive = findContactsAndStudents(pageable, search, statusId, courseId, contactArchiveRepository, studentArchiveRepository, page, pageSize);
-            return new ContactSearchDto(foundContactArchive.getFoundContacts(), page, pageSize, foundContactArchive.getTotalElements());
-        } else if (status != null && status.getStatusName().equalsIgnoreCase("Student")) {            
-            FoundEntitiesDto foundStudentEntities = findStudents(pageable, search, statusId, null, studentRepository);
+            List<AbstractContacts> foundContacts = foundContactArchive.getFoundContacts();
+            return new ContactSearchDto(foundContacts, page, pageSize, foundContacts.size());
+        } else if (status != null && status.getStatusName().equalsIgnoreCase("Student")) {
+            FoundEntitiesDto foundStudentEntities = findStudents(pageable, search, statusId, null, courseId, studentRepository);
             List<AbstractStudent> foundStudents = foundStudentEntities.getFoundStudents();
             if (foundStudents.size() < pageSize) {
-                FoundEntitiesDto foundStudentArchiveEntities = findStudents(PageRequest.of(page, pageSize - foundStudents.size()), search, statusId, null, studentArchiveRepository);
+                FoundEntitiesDto foundStudentArchiveEntities = findStudents(PageRequest.of(page, pageSize - foundStudents.size()), search, statusId, null, courseId, studentArchiveRepository);
                 List<AbstractStudent> foundStudentArchive = foundStudentArchiveEntities.getFoundStudents();
                 if (!foundStudentArchive.isEmpty())
                     foundStudents.addAll(foundStudentArchive);
             }
             List<? extends AbstractContacts> contactFromStudents = foundStudents.stream().map(AbstractContacts::new).collect(Collectors.toList());
-            return new ContactSearchDto(contactFromStudents, page, pageSize, foundStudentEntities.getTotalElements());
-        } else {            
+            return new ContactSearchDto(contactFromStudents, page, pageSize, contactFromStudents.size());
+        } else {
             FoundEntitiesDto foundContactDto = findContactsAndStudents(pageable, search, statusId, courseId, contactRepository, studentRepository, page, pageSize);
             List<AbstractContacts> foundContacts = foundContactDto.getFoundContacts();
             if (foundContacts.size() < pageSize) {
@@ -78,8 +81,8 @@ public class ContactsService {
                 }
             }
             if (foundContacts.size() < pageSize)
-                addStudents(search, statusId, studentArchiveRepository, page, pageSize, foundContacts);
-            return new ContactSearchDto(foundContacts, page, pageSize, (foundContactDto.getTotalElements()));
+                addStudents(search, statusId, courseId, studentArchiveRepository, page, pageSize, foundContacts);
+            return new ContactSearchDto(foundContacts, page, pageSize, foundContacts.size());
         }
     }
 
@@ -115,8 +118,13 @@ public class ContactsService {
     @Loggable
     @Transactional
     public void updateById(UUID id, ContactsDataDto contactData) {
-            AbstractContacts entity = contactRepository.getByContactId(id).or(() -> contactArchiveRepository.findById(id)).orElseThrow(() -> new ContactNotFoundException(id.toString()));
-            updateEntity(contactData, entity);
+        AbstractContacts entity = contactRepository.getByContactId(id).or(() -> contactArchiveRepository.findById(id)).orElseThrow(() -> new ContactNotFoundException(id.toString()));
+        StatusEntity status = statusRepository.findById(contactData.getStatusId()).orElse(null);
+        updateEntity(contactData, entity);
+        if (entity instanceof ContactArchiveEntity && status != null && !status.getStatusName().equals("Archive")) {
+            contactArchiveRepository.deleteById(id);
+            contactRepository.save(new ContactsEntity(entity));
+        }
     }
 
     private <T extends AbstractContacts> void updateEntity(ContactsDataDto contactData, T entity) {
@@ -150,13 +158,13 @@ public class ContactsService {
 
     @Loggable
     @Transactional
-    public void promoteContactToStudentById(UUID id, StudentsDataDto studentData) {
+    public void promoteContactToStudentById(UUID id, StudentsFromContactDataDto studentData) {
         ContactsEntity contact = contactRepository.findById(id).orElseThrow(() -> new ContactNotFoundException(id.toString()));
         if (!studentRepository.existsById(id)) {
             int statusId = statusRepository.findStatusEntityByStatusName("Student").getStatusId();
             contact.setStatusId(statusId);
             try {
-                studentRepository.save(new StudentEntity(id, studentData));
+                studentRepository.save(new StudentEntity(contact, studentData));
             } catch (Exception e) {
                 throw new DatabaseAddingException(e.getMessage());
             }

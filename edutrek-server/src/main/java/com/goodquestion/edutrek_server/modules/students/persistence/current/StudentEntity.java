@@ -1,12 +1,15 @@
 package com.goodquestion.edutrek_server.modules.students.persistence.current;
 
 
+import com.goodquestion.edutrek_server.modules.contacts.persistence.AbstractContacts;
 import com.goodquestion.edutrek_server.modules.students.dto.StudentsDataDto;
+import com.goodquestion.edutrek_server.modules.students.dto.StudentsFromContactDataDto;
 import com.goodquestion.edutrek_server.modules.students.persistence.AbstractStudent;
-import jakarta.persistence.*;
-import lombok.*;
-
-import java.util.UUID;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @Entity
@@ -20,7 +23,7 @@ public class StudentEntity extends AbstractStudent {
         super(studentsDataDto,statusId);
     }
 
-    public StudentEntity(UUID id, StudentsDataDto studentsDataDto) {
-        super(id, studentsDataDto);
+    public StudentEntity(AbstractContacts contactData, StudentsFromContactDataDto studentsDataDto) {
+        super(contactData, studentsDataDto);
     }
 }

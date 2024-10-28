@@ -1,6 +1,8 @@
 package com.goodquestion.edutrek_server.modules.students.persistence;
 
+import com.goodquestion.edutrek_server.modules.contacts.persistence.AbstractContacts;
 import com.goodquestion.edutrek_server.modules.students.dto.StudentsDataDto;
+import com.goodquestion.edutrek_server.modules.students.dto.StudentsFromContactDataDto;
 import com.goodquestion.edutrek_server.modules.students.persistence.current.StudentEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,7 +17,6 @@ public abstract class AbstractStudent {
 
     @Id
     @Setter(AccessLevel.NONE)
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "student_id")
     private UUID studentId;
     @Column(name = "contact_name")
@@ -63,15 +64,15 @@ public abstract class AbstractStudent {
         this.documentsDone = studentsDataDto.isDocumentsDone();
     }
 
-    public AbstractStudent(UUID id, StudentsDataDto studentsDataDto) {
-        this.studentId = id;
-        this.contactName = studentsDataDto.getContactName();
-        this.phone = studentsDataDto.getPhone();
-        this.email = studentsDataDto.getEmail();
-        this.statusId = studentsDataDto.getStatusId();
-        this.branchId = studentsDataDto.getBranchId();
-        this.targetCourseId = studentsDataDto.getTargetCourseId();
-        this.comment = studentsDataDto.getComment();
+    public AbstractStudent(AbstractContacts contactData, StudentsFromContactDataDto studentsDataDto) {
+        this.studentId = contactData.getContactId();
+        this.contactName = contactData.getContactName();
+        this.phone = contactData.getPhone();
+        this.email = contactData.getEmail();
+        this.statusId = contactData.getStatusId();
+        this.branchId = contactData.getBranchId();
+        this.targetCourseId = contactData.getTargetCourseId();
+        this.comment = contactData.getComment();
         this.fullPayment = studentsDataDto.getFullPayment();
         this.documentsDone = studentsDataDto.isDocumentsDone();
     }
