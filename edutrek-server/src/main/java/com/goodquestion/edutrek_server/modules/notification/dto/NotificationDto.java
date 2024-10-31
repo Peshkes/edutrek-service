@@ -9,13 +9,13 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class NotificationDto {
-    private LocalDateTime notificationDate;
+    private UUID recipientId;
+    private LocalDateTime scheduledTime;
     private String notificationText;
-
-
 }

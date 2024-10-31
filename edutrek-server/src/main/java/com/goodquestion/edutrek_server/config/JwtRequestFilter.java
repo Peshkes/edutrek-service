@@ -56,6 +56,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private boolean checkEndpoint(String method, String servletPath) {
         boolean isRefresh = method.equals("POST") && servletPath.equals("/auth/refresh");
         boolean isSignIn = method.equals("POST") && servletPath.equals("/auth");
-        return !(isSignIn || isRefresh);
+//        boolean isGetNotification = method.equals("GET") && servletPath.equals("/sse/subscribe/{clientId}");
+        return !(isSignIn || isRefresh );
     }
 }

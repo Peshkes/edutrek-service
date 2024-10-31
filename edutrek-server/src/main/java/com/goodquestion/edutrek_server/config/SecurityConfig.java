@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -50,6 +51,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/auth/{id}").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.PUT, "/auth/login/{id}", "/auth/password/{id}").access(ownerAuthorizationManager)
                         .requestMatchers(HttpMethod.GET,  "/auth/ping" ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/auth/subscribe/{clientId}").authenticated()
+
 
                         .requestMatchers(HttpMethod.GET, "/branches", "/branches/{id}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/branches").hasRole(PRINCIPAL.toString())
@@ -79,6 +82,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET, "/logs/{id}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/logs/{id}").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/logs/{id}").authenticated()
 
                         .requestMatchers(HttpMethod.GET, "/notifications/{id}", "/notifications/all/{id}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/notifications/{id}").authenticated()
@@ -91,8 +95,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/payments/{id}", "/payments/archive/{id}").authenticated()
 
                         .requestMatchers(HttpMethod.GET,  "/payment_types/{id}", "/payment_types").authenticated()
-
-
 
                         .requestMatchers(HttpMethod.GET, "/statuses", "/statuses/{statusId}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/statuses").hasRole(PRINCIPAL.toString())
@@ -108,7 +110,15 @@ public class SecurityConfig {
 
                         .anyRequest().denyAll()
         );
-        http.csrf(csrf -> csrfTokenRepository());
+//        http.csrf(csrf -> {
+//            csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/auth/subscribe/{clientId}"));
+//            csrfTokenRepository();
+//        });
+        http.csrf(csrf -> {
+            // Игнорируем CSRF для SSE-эндпоинта
+            csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/auth/subscribe/**"));
+            csrf.csrfTokenRepository(csrfTokenRepository());
+        });
 //        http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 //        http.csrf(AbstractHttpConfigurer::disable);
               http.cors(cors -> corsConfigurationSource());
@@ -121,8 +131,8 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*"));
-//        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://10.0.0.6:3000"));
+//        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://10.0.0.6:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowCredentials(true);
         configuration.addAllowedHeader("*");

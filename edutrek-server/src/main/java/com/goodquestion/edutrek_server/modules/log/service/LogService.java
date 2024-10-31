@@ -34,4 +34,9 @@ public class LogService {
                 .orElseThrow(() -> new ShareException.LogNotFoundException(uuid.toString()))
                 .getLogs();
     }
+
+    @Loggable
+    public void  deleteById(UUID uuid) {
+       repository.deleteById(uuid);
+    }
 }

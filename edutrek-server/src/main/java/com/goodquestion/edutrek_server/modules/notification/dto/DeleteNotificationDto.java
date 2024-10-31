@@ -11,5 +11,5 @@ import java.util.UUID;
 @AllArgsConstructor
 public class DeleteNotificationDto {
    private UUID entityId;
-   private int[] notificationId;
+   private Integer[] notificationId;
 }

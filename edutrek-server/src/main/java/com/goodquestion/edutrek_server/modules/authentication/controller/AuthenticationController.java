@@ -3,6 +3,7 @@ package com.goodquestion.edutrek_server.modules.authentication.controller;
 import com.goodquestion.edutrek_server.modules.authentication.dto.*;
 import com.goodquestion.edutrek_server.modules.authentication.persistence.AccountDocument;
 import com.goodquestion.edutrek_server.modules.authentication.service.AuthenticationJWTService;
+import com.goodquestion.edutrek_server.modules.notification.events.SseService;
 import com.goodquestion.edutrek_server.utility_service.JwtService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,6 +32,7 @@ public class AuthenticationController {
     private static final Logger log = LoggerFactory.getLogger(AuthenticationController.class);
     private final JwtService jwtService;
     private final AuthenticationJWTService authenticationService;
+    private final SseService sseService;
 //    private final AuthenticationBaseService authenticationService;
 
     @GetMapping("")
@@ -120,9 +123,14 @@ public class AuthenticationController {
 
     @GetMapping("/ping")
     @ResponseStatus(HttpStatus.OK)
-    public  ResponseEntity<String> ping() {
+    public ResponseEntity<String> ping() {
         System.out.println("Zapingovalsya in " + LocalDateTime.now());
         return new ResponseEntity<>("Pong", HttpStatus.OK);
+    }
+
+    @GetMapping("/subscribe/{clientId}")
+    public SseEmitter subscribe(@PathVariable java.util.UUID clientId) {
+      return sseService.subscribe(clientId);
     }
 
     //UTILS
@@ -130,7 +138,7 @@ public class AuthenticationController {
         Cookie cookie = new Cookie(name, value);
         cookie.setHttpOnly(true);
         cookie.setPath("/");
-//    cookie.setSecure(true);
+        cookie.setSecure(true);
         return cookie;
     }
 }

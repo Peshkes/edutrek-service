@@ -2,10 +2,14 @@ package com.goodquestion.edutrek_server.modules.students.service;
 
 import com.goodquestion.edutrek_server.error.DatabaseException.DatabaseAddingException;
 import com.goodquestion.edutrek_server.error.DatabaseException.DatabaseDeletingException;
+import com.goodquestion.edutrek_server.error.ShareException;
 import com.goodquestion.edutrek_server.error.ShareException.StudentNotFoundException;
+import com.goodquestion.edutrek_server.modules.branch.persistence.BranchRepository;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.AbstractContacts;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.current.ContactsRepository;
 import com.goodquestion.edutrek_server.modules.contacts.service.ContactsService;
+import com.goodquestion.edutrek_server.modules.course.persistence.CourseRepository;
+import com.goodquestion.edutrek_server.modules.log.service.LogService;
 import com.goodquestion.edutrek_server.modules.paymentInformation.persistence.AbstractPaymentInformation;
 import com.goodquestion.edutrek_server.modules.paymentInformation.service.PaymentInfoService;
 import com.goodquestion.edutrek_server.modules.statuses.persistence.StatusEntity;
@@ -29,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+import static com.goodquestion.edutrek_server.utility_service.CommonUtilityMethods.checkStatusCourseBranch;
 import static com.goodquestion.edutrek_server.utility_service.SearchUtilityMethods.findStudents;
 
 @Service
@@ -42,6 +47,9 @@ public class StudentsService {
     private final StudentsArchiveRepository archiveRepository;
     private final StatusRepository statusRepository;
     private final PaymentInfoService paymentInfoService;
+    private final BranchRepository branchRepository;
+    private final CourseRepository courseRepository;
+    private final LogService logService;
 
     @Loggable
     public StudentSearchDto getAll(int page, int pageSize, String search, Integer statusId, UUID groupId, UUID courseId) {
@@ -72,6 +80,7 @@ public class StudentsService {
     @Loggable
     @Transactional
     public void addEntity(StudentsDataDto studentData) {
+        checkStatusCourseBranch(studentData.getBranchId(), studentData.getTargetCourseId(), studentData.getStatusId(), branchRepository, courseRepository,statusRepository);
         if (!repository.existsByPhoneOrEmail(studentData.getPhone(), studentData.getEmail())) {
             int statusId = statusRepository.findStatusEntityByStatusName("Student").getStatusId();
             AbstractContacts contact = contactsRepository.findByPhoneOrEmail(studentData.getPhone(), studentData.getEmail());
@@ -84,10 +93,13 @@ public class StudentsService {
         }
     }
 
+
+
     @Loggable
     @Transactional
     public void deleteById(UUID id) {
         if (!repository.existsById(id)) throw new StudentNotFoundException(id.toString());
+        logService.deleteById(id);
         try {
             repository.deleteById(id);
         } catch (Exception e) {
@@ -98,6 +110,7 @@ public class StudentsService {
     @Loggable
     @Transactional
     public void updateById(UUID id, StudentsDataDto studentData) {
+        checkStatusCourseBranch(studentData.getBranchId(), studentData.getTargetCourseId(), studentData.getStatusId(), branchRepository, courseRepository,statusRepository);
         AbstractStudent entity = repository.getByStudentId(id).or(() -> archiveRepository.findById(id)).orElseThrow(() -> new StudentNotFoundException(id.toString()));
         updateEntity(studentData, entity);
     }

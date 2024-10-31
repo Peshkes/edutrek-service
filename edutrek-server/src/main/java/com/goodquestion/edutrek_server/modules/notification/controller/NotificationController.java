@@ -35,10 +35,10 @@ public class NotificationController {
         return service.getById(id);
     }
 
-    @PostMapping("/{id}")
+    @PostMapping("/{entityId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> addNotificationToId(@PathVariable UUID id, @RequestBody @Valid NotificationDto notificationDto) {
-       service.addNotificationToId(id, notificationDto);
+    public ResponseEntity<String> addNotificationToId(@PathVariable UUID entityId, @RequestBody @Valid NotificationDto notificationDto) {
+       service.addNotificationToId(entityId, notificationDto);
        return new ResponseEntity<>("Notification created", HttpStatus.CREATED);
     }
 

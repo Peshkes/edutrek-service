@@ -2,6 +2,8 @@ package com.goodquestion.edutrek_server.modules.contacts.service;
 
 import com.goodquestion.edutrek_server.error.DatabaseException.DatabaseAddingException;
 import com.goodquestion.edutrek_server.error.DatabaseException.DatabaseDeletingException;
+import com.goodquestion.edutrek_server.error.ShareException;
+import com.goodquestion.edutrek_server.modules.branch.persistence.BranchRepository;
 import com.goodquestion.edutrek_server.modules.contacts.dto.ContactSearchDto;
 import com.goodquestion.edutrek_server.modules.contacts.dto.ContactsDataDto;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.AbstractContacts;
@@ -9,6 +11,8 @@ import com.goodquestion.edutrek_server.modules.contacts.persistence.archive.Cont
 import com.goodquestion.edutrek_server.modules.contacts.persistence.archive.ContactsArchiveRepository;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.current.ContactsEntity;
 import com.goodquestion.edutrek_server.modules.contacts.persistence.current.ContactsRepository;
+import com.goodquestion.edutrek_server.modules.course.persistence.CourseRepository;
+import com.goodquestion.edutrek_server.modules.log.service.LogService;
 import com.goodquestion.edutrek_server.modules.statuses.persistence.StatusEntity;
 import com.goodquestion.edutrek_server.modules.statuses.persistence.StatusRepository;
 import com.goodquestion.edutrek_server.modules.students.dto.FoundEntitiesDto;
@@ -20,8 +24,11 @@ import com.goodquestion.edutrek_server.modules.students.persistence.archive.Stud
 import com.goodquestion.edutrek_server.modules.students.persistence.current.StudentEntity;
 import com.goodquestion.edutrek_server.modules.students.persistence.current.StudentsRepository;
 
+import static com.goodquestion.edutrek_server.utility_service.CommonUtilityMethods.checkStatusCourseBranch;
 import static com.goodquestion.edutrek_server.utility_service.SearchUtilityMethods.*;
 
+import com.goodquestion.edutrek_server.modules.students.service.StudentsService;
+import com.goodquestion.edutrek_server.utility_service.CommonUtilityMethods;
 import com.goodquestion.edutrek_server.utility_service.logging.Loggable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +56,10 @@ public class ContactsService {
     private final ContactsRepository contactRepository;
     private final StudentsRepository studentRepository;
     private final StatusRepository statusRepository;
+    private final BranchRepository branchRepository;
+    private final CourseRepository courseRepository;
+    private final LogService logService;
+
 
 
     @Loggable
@@ -94,9 +105,12 @@ public class ContactsService {
     @Loggable
     @Transactional
     public void addEntity(ContactsDataDto contactData) {
+        checkStatusCourseBranch(contactData.getBranchId(), contactData.getTargetCourseId(), contactData.getStatusId(), branchRepository, courseRepository,statusRepository);
         if (!contactRepository.existsByPhoneOrEmail(contactData.getPhone(), contactData.getEmail())) {
+            ContactsEntity newEntity = new ContactsEntity(contactData.getContactName(), contactData.getPhone(), contactData.getEmail(), contactData.getStatusId(), contactData.getBranchId(), contactData.getTargetCourseId(), contactData.getComment());
             try {
-                contactRepository.save(new ContactsEntity(contactData.getContactName(), contactData.getPhone(), contactData.getEmail(), contactData.getStatusId(), contactData.getBranchId(), contactData.getTargetCourseId(), contactData.getComment()));
+                contactRepository.save(newEntity);
+                logService.add(newEntity.getContactId(), "New contact created ");
             } catch (Exception e) {
                 throw new DatabaseAddingException(e.getMessage());
             }
@@ -108,6 +122,7 @@ public class ContactsService {
     @Transactional
     public void deleteById(UUID id) {
         if (!contactRepository.existsById(id)) throw new ContactNotFoundException(id.toString());
+        logService.deleteById(id);
         try {
             contactRepository.deleteById(id);
         } catch (Exception e) {
@@ -118,6 +133,7 @@ public class ContactsService {
     @Loggable
     @Transactional
     public void updateById(UUID id, ContactsDataDto contactData) {
+        checkStatusCourseBranch(contactData.getBranchId(), contactData.getTargetCourseId(), contactData.getStatusId(), branchRepository, courseRepository,statusRepository);
         AbstractContacts entity = contactRepository.getByContactId(id).or(() -> contactArchiveRepository.findById(id)).orElseThrow(() -> new ContactNotFoundException(id.toString()));
         StatusEntity status = statusRepository.findById(contactData.getStatusId()).orElse(null);
         updateEntity(contactData, entity);
@@ -125,6 +141,7 @@ public class ContactsService {
             contactArchiveRepository.deleteById(id);
             contactRepository.save(new ContactsEntity(entity));
         }
+        logService.add(id, "New contact created ");
     }
 
     private <T extends AbstractContacts> void updateEntity(ContactsDataDto contactData, T entity) {
