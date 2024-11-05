@@ -46,6 +46,6 @@ public class ExpiredPasswordFilter extends OncePerRequestFilter {
     }
 
     private boolean checkEndpoint(String method, String servletPath) {
-        return !method.equals("PUT") && servletPath.equals("/auth/password");
+        return !(method.equals("PUT") && servletPath.equals("/auth/password/{id}"));
     }
 }

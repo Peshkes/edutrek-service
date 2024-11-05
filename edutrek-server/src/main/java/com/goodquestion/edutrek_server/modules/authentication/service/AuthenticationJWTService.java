@@ -32,15 +32,12 @@ public class AuthenticationJWTService extends AuthenticationAbstractService {
     public AuthenticationResultDto signIn(AuthenticationDataDto authenticationDataDto) {
         String username = authenticationDataDto.getLogin();
         UserDetails userDetails = userConfig.loadUserByUsername(username);
-        if (userDetails != null) {
-            if (SecurityConfig.passwordEncoder().matches(authenticationDataDto.getPassword(), userDetails.getPassword())) {
-                String accessToken = jwtService.generateAccessToken(userDetails);
-                String refreshToken = jwtService.generateRefreshToken(userDetails);
-                return new AuthenticationResultDto(accessToken, refreshToken);
-            } else
-                throw new WrongPasswordException();
+        if (SecurityConfig.passwordEncoder().matches(authenticationDataDto.getPassword(), userDetails.getPassword())) {
+            String accessToken = jwtService.generateAccessToken(userDetails);
+            String refreshToken = jwtService.generateRefreshToken(userDetails);
+            return new AuthenticationResultDto(accessToken, refreshToken);
         } else
-            throw new UsernameNotFoundException(username);
+            throw new WrongPasswordException();
     }
 
     @Loggable
