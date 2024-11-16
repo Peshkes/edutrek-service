@@ -19,9 +19,14 @@ public class OwnerAuthorizationManager extends OwnerAbstractAuthorizationManager
 
     @Override
     public AuthorizationDecision check(Supplier<Authentication> authenticationSupplier, RequestAuthorizationContext context) {
-        String pathVariableId = context.getVariables().get("id");
-        UUID accountId = UUID.fromString(pathVariableId);
-        return checkOwnership(authenticationSupplier, accountId);
+        String pathVariable = context.getVariables().get("id");
+        Object accountIdentity;
+        if (pathVariable == null) {
+            accountIdentity = context.getVariables().get("login");
+        } else
+            accountIdentity = UUID.fromString(pathVariable);
+
+        return checkOwnership(authenticationSupplier, accountIdentity);
     }
 
 }

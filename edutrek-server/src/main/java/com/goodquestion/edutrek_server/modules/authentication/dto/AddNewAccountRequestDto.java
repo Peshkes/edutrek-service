@@ -26,5 +26,4 @@ public class AddNewAccountRequestDto {
 
     @NotEmpty(message = ROLES_MANDATORY)
     private List<@NotNull(message = ROLE_NOT_NULL) @Pattern(regexp = "^(PRINCIPAL|MANAGER)$", message = ROLE_INVALID) Roles> roles;
-
 }
