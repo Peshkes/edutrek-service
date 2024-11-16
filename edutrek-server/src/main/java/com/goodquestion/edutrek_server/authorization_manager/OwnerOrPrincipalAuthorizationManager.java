@@ -22,10 +22,14 @@ public class OwnerOrPrincipalAuthorizationManager extends OwnerAbstractAuthoriza
 
     @Override
     public AuthorizationDecision check(Supplier<Authentication> authenticationSupplier, RequestAuthorizationContext context) {
-        String pathVariableId = context.getVariables().get("id");
-        UUID accountId = UUID.fromString(pathVariableId);
+        String pathVariable = context.getVariables().get("id");
+        Object accountIdentity;
+        if (pathVariable == null) {
+            accountIdentity = context.getVariables().get("login");
+        } else
+            accountIdentity = UUID.fromString(pathVariable);
 
-        AuthorizationDecision ownershipDecision = checkOwnership(authenticationSupplier, accountId);
+        AuthorizationDecision ownershipDecision = checkOwnership(authenticationSupplier, accountIdentity);
         if (ownershipDecision.isGranted()) {
             return ownershipDecision;
         }
