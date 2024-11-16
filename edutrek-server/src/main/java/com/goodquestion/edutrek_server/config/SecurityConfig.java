@@ -11,6 +11,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -25,6 +26,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 import java.util.List;
+
 
 import static com.goodquestion.edutrek_server.modules.authentication.persistence.Roles.PRINCIPAL;
 
@@ -50,7 +52,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth", "/auth/refresh").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/auth/{id}").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.PUT, "/auth/login/{id}", "/auth/password/{id}").access(ownerAuthorizationManager)
-                        .requestMatchers(HttpMethod.GET,  "/auth/ping" ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/auth/ping").permitAll()
                         .requestMatchers(HttpMethod.GET, "/auth/subscribe/{clientId}").authenticated()
 
 
@@ -89,12 +91,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/notifications/{id}", "/notifications").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/notifications/{id}").authenticated()
 
-                        .requestMatchers(HttpMethod.GET,  "/payments/paymentid/{id}", "/payments/studentid/{id}").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/payments/paymentid/{id}", "/payments/studentid/{id}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/payments").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/payments/{id}").hasRole(PRINCIPAL.toString())
                         .requestMatchers(HttpMethod.PUT, "/payments/{id}", "/payments/archive/{id}").authenticated()
 
-                        .requestMatchers(HttpMethod.GET,  "/payment_types/{id}", "/payment_types").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/payment_types/{id}", "/payment_types").authenticated()
 
                         .requestMatchers(HttpMethod.GET, "/statuses", "/statuses/{statusId}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/statuses").hasRole(PRINCIPAL.toString())
@@ -110,18 +112,14 @@ public class SecurityConfig {
 
                         .anyRequest().denyAll()
         );
+
 //        http.csrf(csrf -> {
-//            csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/auth/subscribe/{clientId}"));
-//            csrfTokenRepository();
+//            csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/auth/subscribe/**"));
+//            csrf.csrfTokenRepository(csrfTokenRepository());
 //        });
-        http.csrf(csrf -> {
-            // Игнорируем CSRF для SSE-эндпоинта
-            csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/auth/subscribe/**"));
-            csrf.csrfTokenRepository(csrfTokenRepository());
-        });
 //        http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-//        http.csrf(AbstractHttpConfigurer::disable);
-              http.cors(cors -> corsConfigurationSource());
+        http.csrf(AbstractHttpConfigurer::disable);
+        http.cors(cors -> corsConfigurationSource());
         http.addFilterBefore(expiredPasswordFilter, BasicAuthenticationFilter.class);
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -132,7 +130,7 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 //        configuration.setAllowedOrigins(List.of("*"));
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://10.0.0.6:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://10.0.0.6:3000", "https://vp-licence.ru", "http://vp-licence.ru", "https://5.35.89.231", "http://5.35.89.231"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowCredentials(true);
         configuration.addAllowedHeader("*");

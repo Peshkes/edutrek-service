@@ -24,9 +24,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if (checkEndpoint(request.getMethod(), request.getServletPath())) {
-            String accessToken = jwtService.getAccessToken(request);
-            String username = null;
+//            String accessToken = jwtService.getAccessToken(request);
+            String accessToken = jwtService.extractTokenFromAuthorizationHeader(request);
 
+            String username = null;
             if (accessToken != null) {
                 try {
                     username = jwtService.getUsername(accessToken);
@@ -59,4 +60,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 //        boolean isGetNotification = method.equals("GET") && servletPath.equals("/sse/subscribe/{clientId}");
         return !(isSignIn || isRefresh );
     }
+
+
 }

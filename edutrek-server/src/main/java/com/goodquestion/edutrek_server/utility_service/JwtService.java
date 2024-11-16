@@ -104,4 +104,17 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload();
     }
+
+
+    public String extractTokenFromAuthorizationHeader(HttpServletRequest request) {
+        // Получаем заголовок Authorization
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            // Удаляем префикс "Bearer " и возвращаем только сам токен
+            return authHeader.substring(7);  // 7 - длина строки "Bearer "
+        }
+
+        return null;  // Если токен не найден или заголовок не содержит "Bearer"
+    }
 }

@@ -3,6 +3,7 @@ package com.goodquestion.edutrek_server.modules.authentication.dto;
 import static com.goodquestion.edutrek_server.error.ValidationErrors.*;
 
 import com.goodquestion.edutrek_server.modules.authentication.persistence.Roles;
+import com.goodquestion.edutrek_server.modules.authentication.validation.ValidRole;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,6 +26,6 @@ public class AddNewAccountRequestDto {
     private String name;
 
     @NotEmpty(message = ROLES_MANDATORY)
-    private List<@NotNull(message = ROLE_NOT_NULL) @Pattern(regexp = "^(PRINCIPAL|MANAGER)$", message = ROLE_INVALID) Roles> roles;
+    private List<@NotNull(message = ROLE_NOT_NULL) @ValidRole(message = ROLE_INVALID) Roles> roles;
 
 }
